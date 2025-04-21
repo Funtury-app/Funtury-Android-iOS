@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funtury/Authenticatoin/login_page_controller.dart';
 import 'package:funtury/assets_path.dart';
+import 'package:funtury/route_map.dart';
+import 'package:reown_appkit/reown_appkit.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,14 +13,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  
-  // late LoginPageController loginPageController;
+  late LoginPageController loginPageController;
 
   @override
   void initState() {
     super.initState();
-    // loginPageController = LoginPageController(context: context, setState: setState);
-    // loginPageController.initReown();
+    loginPageController =
+        LoginPageController(context: context, setState: setState);
+    loginPageController.init();
   }
 
   @override
@@ -103,14 +106,24 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 18.0,
                   ),
-                  LoginButton(
+                  // LoginButton(
+                  //     loginMethod: "MetaMask",
+                  //     iconPath: AssetsPath.metaMaskIcon,
+                  //     onPressed: () {}),
+                  AppKitModalConnectButton(
+                    appKit: loginPageController.appKitModal,
+                    context: context,
+                    custom: LoginButton(
                       loginMethod: "MetaMask",
                       iconPath: AssetsPath.metaMaskIcon,
-                      onPressed: () {
-                        
-                      }),
-                  
-                  // AppKitModalNetworkSelectButton(appKit: loginPageController.reown.appkitModal),
+                      onPressed: () async {
+                            await loginPageController.appKitModal.openModalView();
+                            if(loginPageController.appKitModal.isConnected && context.mounted){
+                              Navigator.pushReplacementNamed(context, RouteMap.homePage);
+                            }
+                        },
+                    ),
+                  ),
                 ],
               ))),
     );
@@ -142,23 +155,23 @@ class LoginButton extends StatelessWidget {
         ),
       ),
       child: TextButton.icon(
-          onPressed: () => onPressed(),
-          icon: SvgPicture.asset(
-            iconPath,
-            width: 20,
-            height: 20,
+        onPressed: () => onPressed(),
+        icon: SvgPicture.asset(
+          iconPath,
+          width: 20,
+          height: 20,
+        ),
+        iconAlignment: IconAlignment.start,
+        label: Text(
+          loginMethod,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-          iconAlignment: IconAlignment.start,
-          label: Text(
-            loginMethod,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
-),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }
