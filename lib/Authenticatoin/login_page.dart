@@ -26,8 +26,23 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FittedBox(
-          fit: BoxFit.contain,
+        body: Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [
+                0.85,
+                1.0,
+              ],
+              colors: [
+              Colors.white,
+                Theme.of(context).colorScheme.primary,
+              ])),
+      child: FittedBox(
+          alignment: Alignment.center,
+          fit: BoxFit.cover,
           child: Container(
               width: 393,
               height: 852,
@@ -117,16 +132,18 @@ class _LoginPageState extends State<LoginPage> {
                       loginMethod: "MetaMask",
                       iconPath: AssetsPath.metaMaskIcon,
                       onPressed: () async {
-                            await loginPageController.appKitModal.openModalView();
-                            if(loginPageController.appKitModal.isConnected && context.mounted){
-                              Navigator.pushReplacementNamed(context, RouteMap.homePage);
-                            }
-                        },
+                        await loginPageController.appKitModal.openModalView();
+                        if (loginPageController.appKitModal.isConnected &&
+                            context.mounted) {
+                          Navigator.pushReplacementNamed(
+                              context, RouteMap.homePage);
+                        }
+                      },
                     ),
                   ),
                 ],
               ))),
-    );
+    ));
   }
 }
 
