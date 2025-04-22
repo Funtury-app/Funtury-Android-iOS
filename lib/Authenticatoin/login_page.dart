@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funtury/Authenticatoin/login_page_controller.dart';
+import 'package:funtury/Service/reown_service.dart';
 import 'package:funtury/assets_path.dart';
-import 'package:funtury/route_map.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,6 +18,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    if(ReownService.service != null) ReownService.service!.dispose();
+    ReownService.service = ReownService.create(context, setState);
+
     loginPageController =
         LoginPageController(context: context, setState: setState);
     loginPageController.init();
@@ -121,24 +124,13 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 18.0,
                   ),
-                  // LoginButton(
-                  //     loginMethod: "MetaMask",
-                  //     iconPath: AssetsPath.metaMaskIcon,
-                  //     onPressed: () {}),
                   AppKitModalConnectButton(
-                    appKit: loginPageController.appKitModal,
+                    appKit: ReownService.service!.appKitModal!,
                     context: context,
                     custom: LoginButton(
                       loginMethod: "MetaMask",
                       iconPath: AssetsPath.metaMaskIcon,
-                      onPressed: () async {
-                        await loginPageController.appKitModal.openModalView();
-                        if (loginPageController.appKitModal.isConnected &&
-                            context.mounted) {
-                          Navigator.pushReplacementNamed(
-                              context, RouteMap.homePage);
-                        }
-                      },
+                      onPressed: loginPageController.loginWallet,
                     ),
                   ),
                 ],
