@@ -124,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 18.0,
                   ),
+                  AppKitModalNetworkSelectButton(appKit: ReownService.service!.appKitModal!),
                   AppKitModalConnectButton(
                     appKit: ReownService.service!.appKitModal!,
                     context: context,

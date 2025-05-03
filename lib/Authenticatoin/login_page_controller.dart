@@ -19,7 +19,7 @@ class LoginPageController {
       }
 
       if (ReownService.service!.appKitModal!.isConnected && context.mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteMap.homePage);
+        Navigator.of(context).pushNamed(RouteMap.homePage);
       }
     } catch (e) {
       debugPrint("Error initializing ReownService: $e");
@@ -31,7 +31,7 @@ class LoginPageController {
   Future<void> loginWallet() async {
     ReownService.service!.appKitModal!.openModalView().then((value) {
       if (ReownService.service!.appKitModal!.isConnected && context.mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteMap.homePage);
+        Navigator.of(context).pushNamed(RouteMap.homePage);
       }
     });
     return;

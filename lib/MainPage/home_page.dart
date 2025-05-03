@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funtury/MainPage/browser_page.dart';
+import 'package:funtury/MainPage/home_page_controller.dart';
 import 'package:funtury/assets_path.dart';
+import 'package:reown_appkit/modal/pages/public/appkit_modal_all_wallets_page.dart';
 
 class LazyLoadPage extends StatefulWidget {
   final Widget Function() builder;
@@ -39,20 +41,15 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  int _currentScreenIndex = 0;
-  final List<bool> _hasVisited = [false, false, false, false];
-
-  void switchScreen(MainScreen screen) {
-    setState(() {
-      _currentScreenIndex = screen.pageIndex;
-      _hasVisited[screen.pageIndex] = true;
-    });
-  }
+  late HomePageController homePageController;
 
   @override
   void initState() {
     super.initState();
-    _hasVisited[0] = true;
+    homePageController = HomePageController(context: context, setState: setState);
+    homePageController.init();
+
+    homePageController.hasVisited[0] = true;
   }
 
   @override
@@ -80,22 +77,22 @@ class _HomepageState extends State<Homepage> {
               children: [
                 IndexedStack(
                   alignment: Alignment.center,
-                  index: _currentScreenIndex,
+                  index: homePageController.currentScreenIndex,
                   children: [
                     LazyLoadPage(
-                      shouldBuild: _hasVisited[0],
-                      builder: () => const Text('Browser'),
+                      shouldBuild: homePageController.hasVisited[0],
+                      builder: () => BrowserPage(),
                     ),
                     LazyLoadPage(
-                      shouldBuild: _hasVisited[1],
-                      builder: () => const Text('News'),
+                      shouldBuild: homePageController.hasVisited[1],
+                      builder: () => ReownAppKitModalAllWalletsPage(),
                     ),
                     LazyLoadPage(
-                      shouldBuild: _hasVisited[2],
+                      shouldBuild: homePageController.hasVisited[2],
                       builder: () => const Text('Notifications'),
                     ),
                     LazyLoadPage(
-                      shouldBuild: _hasVisited[3],
+                      shouldBuild: homePageController.hasVisited[3],
                       builder: () => const Text('Wallet'),
                     ),
                   ],
@@ -116,7 +113,7 @@ class _HomepageState extends State<Homepage> {
                             height: 57,
                             width: 57,
                             decoration: BoxDecoration(
-                              color: _currentScreenIndex == 0
+                              color: homePageController.currentScreenIndex == 0
                                   ? Colors.white
                                   : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
@@ -128,13 +125,13 @@ class _HomepageState extends State<Homepage> {
                                 width: 35,
                                 alignment: Alignment.center,
                               ),
-                              onPressed: () => switchScreen(MainScreen.browser),
+                              onPressed: () => homePageController.switchScreen(MainScreen.browser),
                             )),
                         Container(
                             height: 57,
                             width: 57,
                             decoration: BoxDecoration(
-                              color: _currentScreenIndex == 1
+                              color: homePageController.currentScreenIndex == 1
                                   ? Colors.white
                                   : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
@@ -146,13 +143,13 @@ class _HomepageState extends State<Homepage> {
                                 width: 35,
                                 alignment: Alignment.center,
                               ),
-                              onPressed: () => switchScreen(MainScreen.news),
+                              onPressed: () => homePageController.switchScreen(MainScreen.news),
                             )),
                         Container(
                             height: 57,
                             width: 57,
                             decoration: BoxDecoration(
-                              color: _currentScreenIndex == 2
+                              color: homePageController.currentScreenIndex == 2
                                   ? Colors.white
                                   : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
@@ -165,13 +162,13 @@ class _HomepageState extends State<Homepage> {
                                 alignment: Alignment.center,
                               ),
                               onPressed: () =>
-                                  switchScreen(MainScreen.notificatoins),
+                                  homePageController.switchScreen(MainScreen.notificatoins),
                             )),
                         Container(
                             height: 57,
                             width: 57,
                             decoration: BoxDecoration(
-                              color: _currentScreenIndex == 3
+                              color: homePageController.currentScreenIndex == 3
                                   ? Colors.white
                                   : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
@@ -183,7 +180,7 @@ class _HomepageState extends State<Homepage> {
                                 width: 35,
                                 alignment: Alignment.center,
                               ),
-                              onPressed: () => switchScreen(MainScreen.wallet),
+                              onPressed: () => homePageController.switchScreen(MainScreen.wallet),
                             )),
                       ],
                     ),
