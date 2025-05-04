@@ -46,7 +46,8 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    homePageController = HomePageController(context: context, setState: setState);
+    homePageController =
+        HomePageController(context: context, setState: setState);
     homePageController.init();
 
     homePageController.hasVisited[0] = true;
@@ -62,131 +63,162 @@ class _HomepageState extends State<Homepage> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 stops: [
-                  0.85,
-                  1.0,
+                  0,
+                  0.28,
                 ],
                 colors: [
-                  Colors.white,
                   Theme.of(context).colorScheme.primary,
+                  Colors.white,
                 ],
               ),
             ),
-            child: Stack(
-              fit: StackFit.expand,
-              alignment: Alignment.center,
-              children: [
-                IndexedStack(
-                  alignment: Alignment.center,
-                  index: homePageController.currentScreenIndex,
-                  children: [
-                    LazyLoadPage(
-                      shouldBuild: homePageController.hasVisited[0],
-                      builder: () => BrowserPage(),
-                    ),
-                    LazyLoadPage(
-                      shouldBuild: homePageController.hasVisited[1],
-                      builder: () => ReownAppKitModalAllWalletsPage(),
-                    ),
-                    LazyLoadPage(
-                      shouldBuild: homePageController.hasVisited[2],
-                      builder: () => const Text('Notifications'),
-                    ),
-                    LazyLoadPage(
-                      shouldBuild: homePageController.hasVisited[3],
-                      builder: () => const Text('Wallet'),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  bottom: 20,
-                  child: Container(
-                    height: 60,
-                    width: 340,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(70)),
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Container(
-                            height: 57,
-                            width: 57,
-                            decoration: BoxDecoration(
-                              color: homePageController.currentScreenIndex == 0
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: SvgPicture.asset(
-                                AssetsPath.homeIcon,
-                                height: 31.11,
-                                width: 35,
-                                alignment: Alignment.center,
-                              ),
-                              onPressed: () => homePageController.switchScreen(MainScreen.browser),
-                            )),
-                        Container(
-                            height: 57,
-                            width: 57,
-                            decoration: BoxDecoration(
-                              color: homePageController.currentScreenIndex == 1
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: SvgPicture.asset(
-                                AssetsPath.newsIcon,
-                                height: 35,
-                                width: 35,
-                                alignment: Alignment.center,
-                              ),
-                              onPressed: () => homePageController.switchScreen(MainScreen.news),
-                            )),
-                        Container(
-                            height: 57,
-                            width: 57,
-                            decoration: BoxDecoration(
-                              color: homePageController.currentScreenIndex == 2
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: SvgPicture.asset(
-                                AssetsPath.bellIcon,
-                                height: 40,
-                                width: 35,
-                                alignment: Alignment.center,
-                              ),
-                              onPressed: () =>
-                                  homePageController.switchScreen(MainScreen.notificatoins),
-                            )),
-                        Container(
-                            height: 57,
-                            width: 57,
-                            decoration: BoxDecoration(
-                              color: homePageController.currentScreenIndex == 3
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: SvgPicture.asset(
-                                AssetsPath.walletIcon,
-                                height: 35,
-                                width: 35,
-                                alignment: Alignment.center,
-                              ),
-                              onPressed: () => homePageController.switchScreen(MainScreen.wallet),
-                            )),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Container(
+                  width: 393,
+                  height: 852,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [
+                        0,
+                        0.25,
+                      ],
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Colors.white,
                       ],
                     ),
                   ),
-                ),
-              ],
+                  child: Stack(
+                    fit: StackFit.expand,
+                    alignment: Alignment.center,
+                    children: [
+                      IndexedStack(
+                        alignment: Alignment.center,
+                        index: homePageController.currentScreenIndex,
+                        children: [
+                          LazyLoadPage(
+                            shouldBuild: homePageController.hasVisited[0],
+                            builder: () => BrowserPage(),
+                          ),
+                          LazyLoadPage(
+                            shouldBuild: homePageController.hasVisited[1],
+                            builder: () => ReownAppKitModalAllWalletsPage(),
+                          ),
+                          LazyLoadPage(
+                            shouldBuild: homePageController.hasVisited[2],
+                            builder: () => const Text('Notifications'),
+                          ),
+                          LazyLoadPage(
+                            shouldBuild: homePageController.hasVisited[3],
+                            builder: () => const Text('Wallet'),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        child: Container(
+                          height: 60,
+                          width: 340,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(70)),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                  height: 57,
+                                  width: 57,
+                                  decoration: BoxDecoration(
+                                    color: homePageController
+                                                .currentScreenIndex ==
+                                            0
+                                        ? Colors.white
+                                        : Theme.of(context).colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      AssetsPath.homeIcon,
+                                      height: 31.11,
+                                      width: 35,
+                                      alignment: Alignment.center,
+                                    ),
+                                    onPressed: () => homePageController
+                                        .switchScreen(MainScreen.browser),
+                                  )),
+                              Container(
+                                  height: 57,
+                                  width: 57,
+                                  decoration: BoxDecoration(
+                                    color: homePageController
+                                                .currentScreenIndex ==
+                                            1
+                                        ? Colors.white
+                                        : Theme.of(context).colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      AssetsPath.newsIcon,
+                                      height: 35,
+                                      width: 35,
+                                      alignment: Alignment.center,
+                                    ),
+                                    onPressed: () => homePageController
+                                        .switchScreen(MainScreen.news),
+                                  )),
+                              Container(
+                                  height: 57,
+                                  width: 57,
+                                  decoration: BoxDecoration(
+                                    color: homePageController
+                                                .currentScreenIndex ==
+                                            2
+                                        ? Colors.white
+                                        : Theme.of(context).colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      AssetsPath.bellIcon,
+                                      height: 40,
+                                      width: 35,
+                                      alignment: Alignment.center,
+                                    ),
+                                    onPressed: () => homePageController
+                                        .switchScreen(MainScreen.notificatoins),
+                                  )),
+                              Container(
+                                  height: 57,
+                                  width: 57,
+                                  decoration: BoxDecoration(
+                                    color: homePageController
+                                                .currentScreenIndex ==
+                                            3
+                                        ? Colors.white
+                                        : Theme.of(context).colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                      AssetsPath.walletIcon,
+                                      height: 35,
+                                      width: 35,
+                                      alignment: Alignment.center,
+                                    ),
+                                    onPressed: () => homePageController
+                                        .switchScreen(MainScreen.wallet),
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
             )));
   }
 }

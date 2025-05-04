@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:funtury/Service/Contract/contract.dart';
-import 'package:funtury/Service/reown_service.dart';
-import 'package:funtury/route_map.dart';
+import 'package:funtury/Data/browser_event.dart';
+import 'package:funtury/Service/ganache_service.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 
 class BrowserPageController {
@@ -11,59 +10,57 @@ class BrowserPageController {
   });
   late BuildContext context;
   late void Function(VoidCallback) setState;
-  ReownAppKitModal appKitModal = ReownService.service!.appKitModal!;
+  // ReownAppKitModal appKitModal = ReownService.service!.appKitModal!;
+  GanacheService ganacheService = GanacheService();
 
-  Future<void> logoutWallet() async {
-    appKitModal.disconnect().then((value) {
-      if (appKitModal.isConnected && context.mounted) {
-        Navigator.of(context).pushReplacementNamed(RouteMap.loginPage);
-      }
-    });
+  List<BrowserEvent> events = [];
+
+  List<EthereumAddress> marketAddresses = [];
+  double userBalance = 0;
+
+
+  Future<void> getBalance() async {
+    userBalance = await ganacheService.getBalance();
     return;
   }
 
-  Future<void> burnFrom() async {
-    try {
-      final r1 = appKitModal.getAvailableChains();
-      final r2 = appKitModal.selectedChain;
-      final r3 = appKitModal.selectedWallet;
-      final r4 = appKitModal.getApprovedChains();
-      final r5 = appKitModal.getApprovedMethods();
-      final r6 = appKitModal.getApprovedEvents();
-      final r7 = await appKitModal.loadAccountData();
-      // final r8 = await appKitModal.requestAddChain(ReownAppKitModalNetworkInfo(
-      //     name: "Funtury",
-      //     chainId: "1337",
-      //     currency: "T",
-      //     rpcUrl: "https://ff27-120-126-194-244.ngrok-free.app",
-      //     explorerUrl: "",
-      //     isTestNetwork: true));
-      final r9 = await appKitModal.requestSwitchToChain(ReownAppKitModalNetworkInfo(
-          name: "Funtury",
-          chainId: "eip155:1337",
-          currency: "T",
-          rpcUrl: "https://6722-2001-b400-e174-69a3-a8c8-9e7-ed38-ed46.ngrok-free.app",
-          explorerUrl: "",));
-      final r10 = await appKitModal.connectSelectedWallet();
+  Future<void> getAllMarkets() async{
+    marketAddresses = await ganacheService.queryAllMarket();
+    return;
+  }
 
-      // final r11 = appKitModal.launchConnectedWallet();
+  Future<void> init() async{
+    // final result = await Future.wait([
+    //   ganacheService.getBalance(),
+    //   ganacheService.queryAllMarket(),
+    // ]);
+    // userBalance = result[0] as double;
+    // marketAddresses = result[1] as List<EthereumAddress>;
 
-      final result = await appKitModal.requestWriteContract(
-          topic: appKitModal.session!.topic.toString(),
-          chainId: 'eip155:1337',
-          deployedContract: Contract.tokenERC20,
-          functionName: "burnFrom",
-          parameters: [
-            '0xFbe0a8f15b2749fa8BB6263A8ac84E3a0D7995Ad',
-            BigInt.from(1e+18)
-          ],
-          transaction: Transaction(
-              from: EthereumAddress.fromHex(
-                  "0x7Ff027B41e733b955de337A07928fa1b2f96C993")));
-      debugPrint("Process success");
-    } catch (e) {
-      debugPrint("Error occur: ${e.toString()}");
+    // for(int i = 0 ; i < marketAddresses.length ;i ++){
+    //   events.add(BrowserEvent(marketAddress: marketAddresses[i]));
+    // }
+
+    events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 20, noProbability: 80));
+    events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 40, noProbability: 60));
+
+    if(
+      context.mounted){
+      setState(() {});
     }
-    return;
   }
+
+  Future<void> refresh() async{
+
+  }
+  
 }
+
+  // Future<void> logoutWallet() async {
+  //   appKitModal.disconnect().then((value) {
+  //     if (appKitModal.isConnected && context.mounted) {
+  //       Navigator.of(context).pushReplacementNamed(RouteMap.loginPage);
+  //     }
+  //   });
+  //   return;
+  // }
