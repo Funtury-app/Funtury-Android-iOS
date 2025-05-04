@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:funtury/Service/Contract/Funtury_contract.dart';
+import 'package:funtury/Service/Contract/prediction_market_contract.dart';
 // import 'package:funtury/Service/Contract/contract_abi_json.dart';
 // import 'package:funtury/Service/Contract/contract_address.dart';
 import 'package:http/http.dart';
@@ -13,11 +14,10 @@ import 'package:web3dart/crypto.dart';
 // import 'package:bip39/bip39.dart' as bip39;
 
 class GanacheService {
-  static const String _rpcUrl =
-      "https://f60b-2001-b400-e162-6ae1-84db-5e7c-f4d8-e212.ngrok-free.app";
+  static const String _rpcUrl = "https://947c-120-126-194-248.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
       "0x5a6e7d345770f89593791ea4aab8882dd2e8c3ca6e3219d5c4a82de775f0341a");
-  static final EthereumAddress _userAddress =
+  static final EthereumAddress userAddress =
       EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD");
 
   late Client httpClient;
@@ -60,9 +60,8 @@ class GanacheService {
       final result = await ganacheClient.call(
           contract: FunturyContract.funturyContract,
           function: FunturyContract.getBalance,
-          params: [_userAddress]);
-
-      final balance = result[0] / BigInt.from(10).pow(18);
+          params: [userAddress]);
+      final balance = (result[0] as BigInt) / BigInt.from(10).pow(18);
       debugPrint("GanacheService getBalance result: $balance");
       return balance.toDouble();
     } catch (e) {
@@ -98,23 +97,77 @@ class GanacheService {
     //   debugPrint("GanacheService queryAllMarket error: $e");
     // }
 
-    try{
+    try {
       final result = await ganacheClient.call(
           contract: FunturyContract.funturyContract,
           function: FunturyContract.getAllMarkets,
           params: []);
-      final markets = result[0] as List<EthereumAddress>;
+      final markets = List<EthereumAddress>.from(result[0] as List);
       debugPrint("GanacheService getAllMarkets result: $markets");
       return markets;
-    } catch(e){
+    } catch (e) {
       debugPrint("GanacheService getAllMarkets error: $e");
       return [];
+    }
+  }
+
+  Future<void> claimedFreeToken() async {
+    try {
+      final tx = await ganacheClient.signTransaction(
+          _privateKey,
+          Transaction(
+            from: _privateKey.address,
+            gasPrice: EtherAmount.inWei(BigInt.from(20000000000)),
+            maxGas: 100000,
+            value: EtherAmount.zero(),
+            to: FunturyContract.contractAddress,
+            data: FunturyContract.claimFreeTokens.encodeCall([]),
+          ),
+          chainId: 1337);
+
+      final result = await ganacheClient.sendRawTransaction(tx);
+      debugPrint("GanacheService transferTo result: $result");
+    } catch (e) {
+      debugPrint("GanacheService transferTo error: $e");
+    }
+  }
+
+  Future<bool> checkFreeTokenClaimed() async {
+    try {
+      final result = await ganacheClient.call(
+          contract: FunturyContract.funturyContract,
+          function: FunturyContract.hasClaimedFreeTokens,
+          params: [userAddress]);
+      debugPrint("GanacheService checkFreeTokenClaimed result: $result");
+      return result[0];
+    } catch (e) {
+      debugPrint("GanacheService checkFreeTokenClaimed error: $e");
+      return false;
     }
   }
 
   /// Funtury contract transfer function ///
 
   /// Prediction contract transfer function ///
+
+  Future<(double, double)> getUserPosition(EthereumAddress marketAddress) async {
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+
+    try{
+      
+      final result = await ganacheClient.call(
+          contract: predictionMarketContract.contract,
+          function: predictionMarketContract.getUserShares(),
+          params: [userAddress]);
+      debugPrint("GanacheService getUserPosition result: $result");
+      
+      return ((result[0] as BigInt).toDouble(), (result[1] as BigInt).toDouble());
+    } catch(e){
+      debugPrint("GanacheService getUserPosition error: $e");
+      return (0.0, 0.0);
+    }
+  }
 
   /// Prediction contract transfer function ///
 }
