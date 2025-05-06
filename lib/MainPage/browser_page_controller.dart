@@ -16,13 +16,6 @@ class BrowserPageController {
   List<BrowserEvent> events = [];
 
   List<EthereumAddress> marketAddresses = [];
-  double userBalance = 0;
-
-
-  Future<void> getBalance() async {
-    userBalance = await ganacheService.getBalance();
-    return;
-  }
 
   Future<void> getAllMarkets() async{
     marketAddresses = await ganacheService.queryAllMarket();
@@ -31,14 +24,12 @@ class BrowserPageController {
 
   Future<void> init() async{
     // final result = await Future.wait([
-    //   ganacheService.getBalance(),
     //   ganacheService.queryAllMarket(),
     // ]);
-    // userBalance = result[0] as double;
-    // marketAddresses = result[1] as List<EthereumAddress>;
+    // marketAddresses = result[0];
 
     // for(int i = 0 ; i < marketAddresses.length ;i ++){
-    //   events.add(BrowserEvent(marketAddress: marketAddresses[i]));
+    //   events.add(BrowserEvent(marketAddress: marketAddresses[i], yesProbability: Random().nextInt(100), noProbability: Random().nextInt(100)));
     // }
 
     events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 20, noProbability: 80));

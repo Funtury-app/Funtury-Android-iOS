@@ -25,95 +25,96 @@ class _BrowserPageState extends State<BrowserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [
-                0,
-                0.28,
-              ],
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Colors.white,
-              ],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  "Home",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Container(
-                  width: 320,
-                  height: 30,
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.25),
-                        offset: Offset(4, 4),
-                        blurRadius: 4,
-                      )
-                    ],
-                  ),
-                  child: Text(
-                    "Search",
-                    style: TextStyle(
-                      color: Color(0xFF666666),
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  backgroundColor: Colors.transparent,
-                  onRefresh: browserPageController.refresh,
-                  child: browserPageController.events.isEmpty
-                      ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          children: [
-                            SizedBox(height: 100),
-                            Center(child: Text("No events to display")),
-                          ],
-                        )
-                      : ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.all(16.0),
-                          itemCount: browserPageController.events.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: EventCard(
-                                event: browserPageController.events[index],
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: Container(
+        padding: const EdgeInsets.only(top: 50.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [
+              0,
+              0.28,
+            ],
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Colors.white,
             ],
           ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                "Home",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Container(
+                width: 320,
+                height: 30,
+                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.25),
+                      offset: Offset(4, 4),
+                      blurRadius: 4,
+                    )
+                  ],
+                ),
+                child: Text(
+                  "Search",
+                  style: TextStyle(
+                    color: Color(0xFF666666),
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                backgroundColor: Colors.transparent,
+                onRefresh: browserPageController.refresh,
+                child: browserPageController.events.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(height: 100),
+                          Center(child: Text("No events to display")),
+                        ],
+                      )
+                    : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.all(16.0),
+                        itemCount: browserPageController.events.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: EventCard(
+                              event: browserPageController.events[index],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );

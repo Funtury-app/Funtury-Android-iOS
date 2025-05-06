@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           },
         )),
         routes: RouteMap.routes,
-        initialRoute: RouteMap.loginPage,
+        initialRoute: RouteMap.homePage,
       ),
     );
   }

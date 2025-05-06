@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funtury/MainPage/browser_page.dart';
 import 'package:funtury/MainPage/home_page_controller.dart';
+import 'package:funtury/MainPage/wallet_page.dart';
 import 'package:funtury/assets_path.dart';
 import 'package:reown_appkit/modal/pages/public/appkit_modal_all_wallets_page.dart';
 
@@ -62,10 +63,15 @@ class _HomepageState extends State<Homepage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: [
-                  0,
-                  0.28,
-                ],
+                stops: homePageController.currentScreenIndex == 0
+                    ? [
+                        0,
+                        0.28,
+                      ]
+                    : [
+                        0.0,
+                        0.0,
+                      ],
                 colors: [
                   Theme.of(context).colorScheme.primary,
                   Colors.white,
@@ -81,10 +87,15 @@ class _HomepageState extends State<Homepage> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      stops: [
-                        0,
-                        0.25,
-                      ],
+                      stops: homePageController.currentScreenIndex == 0
+                          ? [
+                              0,
+                              0.28,
+                            ]
+                          : [
+                              0.0,
+                              0.0,
+                            ],
                       colors: [
                         Theme.of(context).colorScheme.primary,
                         Colors.white,
@@ -105,7 +116,7 @@ class _HomepageState extends State<Homepage> {
                           ),
                           LazyLoadPage(
                             shouldBuild: homePageController.hasVisited[1],
-                            builder: () => ReownAppKitModalAllWalletsPage(),
+                            builder: () => Text("News"),
                           ),
                           LazyLoadPage(
                             shouldBuild: homePageController.hasVisited[2],
@@ -113,7 +124,7 @@ class _HomepageState extends State<Homepage> {
                           ),
                           LazyLoadPage(
                             shouldBuild: homePageController.hasVisited[3],
-                            builder: () => const Text('Wallet'),
+                            builder: () => WalletPage(),
                           ),
                         ],
                       ),

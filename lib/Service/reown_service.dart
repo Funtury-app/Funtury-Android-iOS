@@ -35,15 +35,6 @@ class ReownService {
 
   factory ReownService.create(
       BuildContext context, void Function(VoidCallback) setState) {
-    
-    // ReownAppKitModalNetworks.addSupportedNetworks(NetworkUtils.eip155, [
-    //   ReownAppKitModalNetworkInfo(
-    //       name: "Funtury",
-    //       chainId: "1337",
-    //       currency: 'ETH',
-    //       rpcUrl: "https://6722-2001-b400-e174-69a3-a8c8-9e7-ed38-ed46.ngrok-free.app",
-    //       explorerUrl: "https://6722-2001-b400-e174-69a3-a8c8-9e7-ed38-ed46.ngrok-free.app",)]);
-    
     ReownService temp = ReownService(context: context, setState: setState);
     temp.appKitModal = ReownAppKitModal(
       context: context,
