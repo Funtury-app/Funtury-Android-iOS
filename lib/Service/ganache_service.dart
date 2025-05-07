@@ -6,15 +6,14 @@ import 'package:funtury/Service/Contract/prediction_market_contract.dart';
 // import 'package:funtury/Service/Contract/contract_abi_json.dart';
 // import 'package:funtury/Service/Contract/contract_address.dart';
 import 'package:http/http.dart';
-import 'package:reown_appkit/reown_appkit.dart';
-import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 // import 'package:reown_appkit/solana/solana_common/src/converters/hex_codec.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:bip32/bip32.dart' as bip32;
 // import 'package:bip39/bip39.dart' as bip39;
 
 class GanacheService {
-  static const String _rpcUrl = "https://947c-120-126-194-248.ngrok-free.app";
+  static const String _rpcUrl = "https://cab0-120-126-194-245.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
       "0x5a6e7d345770f89593791ea4aab8882dd2e8c3ca6e3219d5c4a82de775f0341a");
   static final EthereumAddress userAddress =

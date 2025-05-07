@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:funtury/Service/reown_service.dart';
+import 'package:funtury/Service/wallet_service.dart';
 import 'package:funtury/route_map.dart';
-import 'package:reown_appkit/modal/i_appkit_modal_impl.dart';
 
 class LoginPageController {
   LoginPageController({
@@ -12,28 +11,59 @@ class LoginPageController {
   late BuildContext context;
   late void Function(VoidCallback) setState;
 
-  Future init() async {
-    try {
-      if(ReownService.service!.appKitModal!.status != ReownAppKitModalStatus.initialized) {
-        await ReownService.service!.init();
-      }
+  // late WalletService walletService;
 
-      if (ReownService.service!.appKitModal!.isConnected && context.mounted) {
-        Navigator.of(context).pushNamed(RouteMap.homePage);
-      }
-    } catch (e) {
-      debugPrint("Error initializing ReownService: $e");
-    }
+  bool isConnecting = false;
 
+  Future init() async{
+    // walletService = Provider.of<WalletService>(context);
+    // if (walletService.isConnected) {
+    //   Navigator.of(context).pushReplacementNamed(RouteMap.homePage);
+    //   debugPrint("Wallet address: ${walletService.address}"); // Debugging line
+    // }
     return;
   }
 
   Future<void> loginWallet() async {
-    ReownService.service!.appKitModal!.openModalView().then((value) {
-      if (ReownService.service!.appKitModal!.isConnected && context.mounted) {
-        Navigator.of(context).pushNamed(RouteMap.homePage);
-      }
+    if (isConnecting) return;
+    setState(() {
+      isConnecting = true;
     });
+
+    try {
+      // if (!walletService.isConnected) {
+      //   await walletService.connectWallet(context);
+      // }
+      // if (context.mounted) Navigator.of(context).pushReplacementNamed(RouteMap.homePage);
+      // debugPrint("Wallet address: ${walletService.address}");
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content: const Text(
+                    "Failed to connect to wallet. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+        debugPrint("Login error: $e");
+      }
+    }
+
+    if (context.mounted) {
+      setState(() {
+        isConnecting = false;
+      });
+    }
     return;
   }
 }

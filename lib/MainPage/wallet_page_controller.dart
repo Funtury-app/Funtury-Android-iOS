@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funtury/Service/ganache_service.dart';
-import 'package:reown_appkit/reown_appkit.dart';
+import 'package:web3dart/credentials.dart';
 
 class WalletPageController {
   WalletPageController({

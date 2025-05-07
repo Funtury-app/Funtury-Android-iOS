@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reown_appkit/modal/widgets/miscellaneous/segmented_control.dart';
-import 'package:reown_appkit/reown_appkit.dart';
+import 'package:web3dart/credentials.dart';
 
 class TradeDetailPageController {
   TradeDetailPageController(
@@ -12,40 +11,43 @@ class TradeDetailPageController {
   late void Function(VoidCallback) setState;
   late EthereumAddress marketAddress;
 
-
   bool isYesDiagram = true;
   bool isBuyingPosition = true;
   bool isYesPosition = true;
   bool marketInfoLoading = false;
 
+  int slidingYesNoDiagram = 0;
+  int slidingPosition = 0;
 
-  Future<void> init() async{
-    setState((){
+  Future<void> init() async {
+    setState(() {
       marketInfoLoading = true;
     });
 
-    
-
-
-    setState((){
+    setState(() {
       marketInfoLoading = false;
     });
   }
 
-  void switchDiagram(SegmentOption option){
-    setState((){
-      isYesDiagram = option == SegmentOption.option1;
+  void switchDiagram(int? newValue) {
+    if (newValue == null) return;
+    setState(() {
+      slidingYesNoDiagram = newValue;
+      isYesDiagram = newValue == 0 ? true : false;
     });
   }
 
-  void switchPosition(SegmentOption option){
-    setState((){
-      isBuyingPosition = option == SegmentOption.option1;
+  void switchPosition(int? newValue) {
+    if (newValue == null) return;
+
+    setState(() {
+      slidingPosition = newValue;
+      isBuyingPosition = newValue == 0 ? true : false;
     });
   }
 
-  void switchYesNoPosition(bool isYes){
-    setState((){
+  void switchYesNoOutcome(bool isYes) {
+    setState(() {
       isYesPosition = isYes;
     });
   }

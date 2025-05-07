@@ -4,7 +4,6 @@ import 'package:funtury/MainPage/browser_page.dart';
 import 'package:funtury/MainPage/home_page_controller.dart';
 import 'package:funtury/MainPage/wallet_page.dart';
 import 'package:funtury/assets_path.dart';
-import 'package:reown_appkit/modal/pages/public/appkit_modal_all_wallets_page.dart';
 
 class LazyLoadPage extends StatefulWidget {
   final Widget Function() builder;

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:funtury/Service/Contract/contract_abi_json.dart';
-import 'package:reown_appkit/reown_appkit.dart';
+import 'package:web3dart/web3dart.dart';
 
 class FunturyContract {
   static DeployedContract funturyContract = DeployedContract(

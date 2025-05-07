@@ -1,7 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funtury/MainPage/trade_detail_page_controller.dart';
-import 'package:reown_appkit/modal/widgets/miscellaneous/segmented_control.dart';
-import 'package:reown_appkit/reown_appkit.dart';
+import 'package:web3dart/credentials.dart';
 
 class TradeDetailPage extends StatefulWidget {
   const TradeDetailPage({super.key, required this.marketAddress});
@@ -115,12 +115,20 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                       child: Column(
                         children: [
                           // Yes No diagram switcher
-                          SegmentedControl(
+                          SizedBox(
                             width: 200,
-                            onChange: (option) =>
-                                tradeDetailPageController.switchDiagram(option),
-                            option1Title: "YES",
-                            option2Title: "No",
+                            child: CupertinoSlidingSegmentedControl(
+                              children: {
+                                0: Text("Yes"),
+                                1: Text("No"),
+                              },
+                              groupValue:
+                                  tradeDetailPageController.slidingYesNoDiagram,
+                              onValueChanged: (int? newValue) {
+                                tradeDetailPageController
+                                    .switchDiagram(newValue!);
+                              },
+                            ),
                           ),
                           Expanded(
                               child: Container(
@@ -149,12 +157,20 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Buy Sell position button
-                          SegmentedControl(
+                          SizedBox(
                             width: 200,
-                            onChange: (option) => tradeDetailPageController
-                                .switchPosition(option),
-                            option1Title: "Buy",
-                            option2Title: "Sell",
+                            child: CupertinoSlidingSegmentedControl(
+                              children: {
+                                0: Text("Buy"),
+                                1: Text("Sell"),
+                              },
+                              groupValue:
+                                  tradeDetailPageController.slidingPosition,
+                              onValueChanged: (int? newValue) {
+                                tradeDetailPageController
+                                    .switchPosition(newValue!);
+                              },
+                            ),
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -174,10 +190,13 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                       ),
-                                      shadowColor: tradeDetailPageController.isYesPosition ? Colors.black.withOpacity(0.25) : Colors.transparent,
+                                      shadowColor: tradeDetailPageController
+                                              .isYesPosition
+                                          ? Colors.black.withOpacity(0.25)
+                                          : Colors.transparent,
                                     ),
                                     onPressed: () => tradeDetailPageController
-                                        .switchYesNoPosition(true),
+                                        .switchYesNoOutcome(true),
                                     child: Row(
                                       children: [
                                         SizedBox(
@@ -214,10 +233,13 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                       ),
-                                      shadowColor: tradeDetailPageController.isYesPosition ? Colors.transparent : Colors.black.withOpacity(0.25),
+                                      shadowColor: tradeDetailPageController
+                                              .isYesPosition
+                                          ? Colors.transparent
+                                          : Colors.black.withOpacity(0.25),
                                     ),
                                     onPressed: () => tradeDetailPageController
-                                        .switchYesNoPosition(false),
+                                        .switchYesNoOutcome(false),
                                     child: Row(
                                       children: [
                                         SizedBox(
@@ -247,9 +269,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              
-                            ],
+                            children: [],
                           ),
                         ],
                       ),

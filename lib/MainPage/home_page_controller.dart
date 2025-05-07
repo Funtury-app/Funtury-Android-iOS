@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:funtury/MainPage/home_page.dart';
-import 'package:reown_appkit/reown_appkit.dart';
 
 class HomePageController {
   HomePageController({
@@ -13,8 +12,6 @@ class HomePageController {
 
   int currentScreenIndex = 0;
   final List<bool> hasVisited = [false, false, false, false];
-
-  late ReownAppKitModal appKitModal;
 
   Future init() async {}
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funtury/MainPage/wallet_page_controller.dart';
-import 'package:reown_appkit/reown_appkit.dart';
+import 'package:web3dart/credentials.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
