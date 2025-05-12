@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:funtury/Data/wallet_event.dart';
 import 'package:funtury/Service/ganache_service.dart';
 import 'package:web3dart/credentials.dart';
 
@@ -13,7 +14,7 @@ class WalletPageController {
 
   late EthereumAddress walletAddress;
   late double balance;
-  Map<EthereumAddress, (double, double)> userPosition = {};
+  List<WalletEvent> userPosition = [];
 
   GanacheService ganacheService = GanacheService();
 
@@ -57,12 +58,16 @@ class WalletPageController {
     });
 
     try {
-      final marketAddress = await ganacheService.queryAllMarket();
+      final result = await ganacheService.queryAllMarkets();
 
-      for (var address in marketAddress) {
-        final result = await ganacheService.getUserPosition(address);
-        if (result.$1 != 0 || result.$2 != 0) {
-          userPosition[address] = result;
+      for (var data in result) {
+        WalletEvent event = WalletEvent.fromData(data);
+        final position =
+            await ganacheService.getUserPosition(event.marketAddress);
+        if (position.$1 != 0 || position.$2 != 0) {
+          event.yesShares = position.$1.toInt();
+          event.noShares = position.$2.toInt();
+          userPosition.add(event);
         }
       }
       // userPosition[

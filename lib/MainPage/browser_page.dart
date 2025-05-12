@@ -195,7 +195,7 @@ class _EventCardState extends State<EventCard> {
                             SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                widget.event.marketAddress.toString(),
+                                widget.event.title,
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.bold,

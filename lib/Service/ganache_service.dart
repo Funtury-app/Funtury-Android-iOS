@@ -6,6 +6,7 @@ import 'package:funtury/Service/Contract/prediction_market_contract.dart';
 // import 'package:funtury/Service/Contract/contract_abi_json.dart';
 // import 'package:funtury/Service/Contract/contract_address.dart';
 import 'package:http/http.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 // import 'package:reown_appkit/solana/solana_common/src/converters/hex_codec.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -16,9 +17,9 @@ class GanacheService {
   static const String _rpcUrl =
       "https://36c3-2001-b400-e3e7-323c-e965-e611-9c7c-2c30.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
-      "0x6c78d6e98f7f04d8a31abb047ea6f702c188b20c2380dcf33f9c883e794e5a47");
+      "0x21748d9e0ece7fb31349a8f97cbbf9781339b687db673023a90d53cfcb3de404");
   static final EthereumAddress userAddress =
-      EthereumAddress.fromHex("0x57EE88b007F83cfD00743f7F2C88FD1826F26ed7");
+      EthereumAddress.fromHex("0x9555811b9e19A2843162C7C577A09bC52a7f2885");
 
   late Client httpClient;
   late Web3Client ganacheClient;
@@ -70,33 +71,47 @@ class GanacheService {
     }
   }
 
-  Future<List<EthereumAddress>> queryAllMarket() async {
-    // try {
-    //   final filter = FilterOptions(
-    //     address: FunturyContract.contractAddress,
-    //     topics: [
-    //       [
-    //         bytesToHex(FunturyContract.marketCreated.signature, include0x: true)
-    //       ],
-    //     ],
-    //     fromBlock: const BlockNum.genesis(),
-    //     toBlock: const BlockNum.current(),
-    //   );
+  Future<List<Map<String, dynamic>>> queryAllMarkets() async {
+    List<Map<String, dynamic>> data = [];
 
-    //   final logs = await ganacheClient.getLogs(filter);
+    try {
+      final filter = FilterOptions(
+        address: FunturyContract.contractAddress,
+        topics: [
+          [
+            bytesToHex(FunturyContract.marketCreated.signature, include0x: true)
+          ],
+        ],
+        fromBlock: const BlockNum.genesis(),
+        toBlock: const BlockNum.current(),
+      );
 
-    //   for (var log in logs) {
-    //     final decodedLog = FunturyContract.marketCreated.decodeResults(
-    //       log.topics!,
-    //       log.data!,
-    //     );
+      final logs = await ganacheClient.getLogs(filter);
 
-    //     debugPrint(decodedLog.toString());
-    //   }
-    // } catch (e) {
-    //   debugPrint("GanacheService queryAllMarket error: $e");
-    // }
+      for (var log in logs) {
+        final decodedLog = MarketCreatedEvent.fromEventLog(log);
 
+        data.add(
+          {
+            "title": decodedLog.title,
+            "createTime": decodedLog.createTime,
+            "preOrderTime": decodedLog.preOrderTime,
+            "resolutionTime": decodedLog.resolutionTime,
+            "marketContract": decodedLog.marketContract,
+            "yesProbability": 0.5,
+            "noProbability": 0.5,
+          },
+        );
+
+        debugPrint(decodedLog.toString());
+      }
+    } catch (e) {
+      debugPrint("GanacheService queryAllMarket error: $e");
+    }
+    return data;
+  }
+
+  Future<List<EthereumAddress>> getAllMarkets() async {
     try {
       final result = await ganacheClient.call(
           contract: FunturyContract.funturyContract,
@@ -232,8 +247,12 @@ class GanacheService {
             maxGas: 100000,
             value: EtherAmount.zero(),
             to: marketAddress,
-            data: predictionMarketContract.preOrderTransfer().encodeCall(
-                [userAddress, isYes, BigInt.from(price * 1e18), BigInt.from(amount)]),
+            data: predictionMarketContract.preOrderTransfer().encodeCall([
+              userAddress,
+              isYes,
+              BigInt.from(price * 1e18),
+              BigInt.from(amount)
+            ]),
           ),
           chainId: 1337);
       await ganacheClient.sendRawTransaction(tx);

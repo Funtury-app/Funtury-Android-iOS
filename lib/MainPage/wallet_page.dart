@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:funtury/Data/wallet_event.dart';
 import 'package:funtury/MainPage/wallet_page_controller.dart';
 import 'package:web3dart/credentials.dart';
 
@@ -169,22 +170,9 @@ class _WalletPageState extends State<WalletPage> {
                                     )
                                   : ListView.builder(
                                       itemBuilder: (_, index) {
-                                        final marketAddress =
-                                            walletPageController
-                                                .userPosition.keys
-                                                .toList()[index];
-                                        final position = walletPageController
-                                            .userPosition[marketAddress]!;
-                                        return Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 12.0),
-                                            child: PositionCard(
-                                              marketAddress: marketAddress,
-                                              yesPosition:
-                                                  position.$1.toDouble(),
-                                              noPosition:
-                                                  position.$2.toDouble(),
-                                            ));
+                                        return PositionCard(
+                                          event: walletPageController.userPosition[index],
+                                        );
                                       },
                                       itemCount: walletPageController
                                           .userPosition.length))
@@ -195,13 +183,9 @@ class _WalletPageState extends State<WalletPage> {
 class PositionCard extends StatefulWidget {
   const PositionCard(
       {super.key,
-      required this.marketAddress,
-      required this.yesPosition,
-      required this.noPosition});
+      required this.event});
 
-  final EthereumAddress marketAddress;
-  final double yesPosition;
-  final double noPosition;
+  final WalletEvent event;
 
   @override
   State<PositionCard> createState() => _PositionCardState();
@@ -231,17 +215,36 @@ class _PositionCardState extends State<PositionCard> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            height: 40,
-            width: 197,
-            child: Text(
-              widget.marketAddress.toString(),
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold),
-              overflow: TextOverflow.fade,
-            ),
-          ),
+              width: 180,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.event.title,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.fade,
+                    textAlign: TextAlign.left,
+                  ),
+                  Text(
+                    "Preorder Time: ${widget.event.preOrderTime.year}.${widget.event.preOrderTime.month}.${widget.event.preOrderTime.day}",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    "Resolve Time: ${widget.event.resolutionTime.year}.${widget.event.resolutionTime.month}.${widget.event.resolutionTime.day}",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10,
+                        fontWeight: FontWeight.normal),
+                  )
+                ],
+              )),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -272,7 +275,7 @@ class _PositionCardState extends State<PositionCard> {
                     child: Container(
                       alignment: Alignment.center,
                       child: Text(
-                        widget.yesPosition.toStringAsFixed(0),
+                        widget.event.yesShares.toString(),
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -305,13 +308,13 @@ class _PositionCardState extends State<PositionCard> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                    SizedBox(
+                  SizedBox(
                     width: 40,
                     height: 25,
                     child: Container(
                       alignment: Alignment.center,
                       child: Text(
-                        widget.noPosition.toStringAsFixed(0),
+                        widget.event.noShares.toString(),
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,

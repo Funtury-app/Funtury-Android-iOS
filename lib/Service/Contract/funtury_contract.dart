@@ -6,9 +6,9 @@ class FunturyContract {
   static DeployedContract funturyContract = DeployedContract(
     ContractAbi.fromJson(
         jsonEncode(ContractAbiJson.funturyContractAbi), 'FunturyContract'),
-    EthereumAddress.fromHex("0x561742e3b08e6b07d4eb161aecb66f8f57e3e36e"),
+    EthereumAddress.fromHex("0x1c15e65e30FE33126f8A3829D9F5635925df0eBE"),
   );
-  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x561742e3b08e6b07d4eb161aecb66f8f57e3e36e");
+  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x1c15e65e30FE33126f8A3829D9F5635925df0eBE");
 
   // Main contract functions
   static ContractFunction claimFreeTokens = funturyContract.function('claimFreeTokens');
@@ -80,21 +80,23 @@ class TokensClaimedEvent {
 
 class MarketCreatedEvent {
   final String title;
-  final DateTime createTime;
   final EthereumAddress marketContract;
-  final EthereumAddress creator;
+  final DateTime createTime;
+  final DateTime resolutionTime;
+  final DateTime preOrderTime;
   
-  MarketCreatedEvent(this.title, this.createTime, this.marketContract, this.creator);
+  MarketCreatedEvent(this.title, this.createTime, this.marketContract, this.resolutionTime, this.preOrderTime);
   
   static MarketCreatedEvent fromEventLog(FilterEvent event) {
     final decodedData = FunturyContract.marketCreated.decodeResults(event.topics!, event.data!);
     
-    final title = decodedData[0] as String;
-    final createTime = DateTime.fromMicrosecondsSinceEpoch((decodedData[1] as BigInt).toInt());
-    final marketContract = decodedData[2] as EthereumAddress;
-    final creator = decodedData[3] as EthereumAddress;
+    final createTime = DateTime.fromMillisecondsSinceEpoch((decodedData[2] as BigInt).toInt() * 1000);
+    final marketContract = decodedData[0] as EthereumAddress;
+    final title = decodedData[1] as String;
+    final resolutionTime = DateTime.fromMillisecondsSinceEpoch((decodedData[3] as BigInt).toInt() * 1000);
+    final preOrderTime = DateTime.fromMillisecondsSinceEpoch((decodedData[4] as BigInt).toInt() * 1000);
     
-    return MarketCreatedEvent(title, createTime, marketContract, creator);
+    return MarketCreatedEvent(title, createTime, marketContract, resolutionTime, preOrderTime);
   }
 }
 
