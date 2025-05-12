@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:funtury/Data/event_detail.dart';
 import 'package:funtury/MainPage/trade_detail_page_controller.dart';
+import 'package:reown_appkit/reown_appkit.dart';
 import 'package:web3dart/credentials.dart';
 
 class TradeDetailPage extends StatefulWidget {
@@ -23,6 +25,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
       setState: setState,
       marketAddress: widget.marketAddress,
     );
+
     tradeDetailPageController.init();
   }
 
@@ -51,8 +54,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
               extendBody: true,
               extendBodyBehindAppBar: true,
               body: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                padding: const EdgeInsets.fromLTRB(8.0, 25.0, 8.0, 10.0),
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
                   colors: [
@@ -70,7 +72,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back),
@@ -78,202 +80,678 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                             Navigator.pop(context);
                           },
                         ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
                         Container(
-                          width: 60,
-                          height: 60,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          child: Icon(Icons.image,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer),
-                        ),
-                        Text(
-                          widget.marketAddress.toString(),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            tradeDetailPageController
+                                .eventDetail.marketState.name,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Container(
-                      width: 345,
-                      height: 313,
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          // Yes No diagram switcher
-                          SizedBox(
-                            width: 200,
-                            child: CupertinoSlidingSegmentedControl(
-                              children: {
-                                0: Text("Yes"),
-                                1: Text("No"),
-                              },
-                              groupValue:
-                                  tradeDetailPageController.slidingYesNoDiagram,
-                              onValueChanged: (int? newValue) {
-                                tradeDetailPageController
-                                    .switchDiagram(newValue!);
-                              },
-                            ),
-                          ),
-                          Expanded(
-                              child: Container(
-                            color: Colors.blue,
-                          ))
-                        ],
+                    if (tradeDetailPageController.marketInfoLoading)
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      width: 345,
-                      height: 340,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
-                          color: Colors.white.withOpacity(0.11),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              spreadRadius: 0,
-                              blurRadius: 4,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]),
-                      child: Column(
+                    if (!tradeDetailPageController.marketInfoLoading) ...[
+                      // Market title info
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Buy Sell position button
-                          SizedBox(
-                            width: 200,
-                            child: CupertinoSlidingSegmentedControl(
-                              children: {
-                                0: Text("Buy"),
-                                1: Text("Sell"),
-                              },
-                              groupValue:
-                                  tradeDetailPageController.slidingPosition,
-                              onValueChanged: (int? newValue) {
-                                tradeDetailPageController
-                                    .switchPosition(newValue!);
-                              },
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
                             ),
+                            child: Icon(Icons.image,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer),
                           ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                height: 50,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: tradeDetailPageController
-                                              .isYesPosition
-                                          ? Color(0xFF3CEE2C).withOpacity(0.7)
-                                          : Color(0xFF9A9CA1).withOpacity(0.8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      shadowColor: tradeDetailPageController
-                                              .isYesPosition
-                                          ? Colors.black.withOpacity(0.25)
-                                          : Colors.transparent,
-                                    ),
-                                    onPressed: () => tradeDetailPageController
-                                        .switchYesNoOutcome(true),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          child: Text("Yes",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        SizedBox(
-                                            width: 37,
-                                            height: 25,
-                                            child: Text(
-                                              "${58}F",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ))
-                                      ],
-                                    )),
-                              ),
-                              SizedBox(
-                                width: 120,
-                                height: 50,
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: tradeDetailPageController
-                                              .isYesPosition
-                                          ? Color(0xFF9A9CA1).withOpacity(0.8)
-                                          : Color(0xFFEE2C2C).withOpacity(0.7),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      shadowColor: tradeDetailPageController
-                                              .isYesPosition
-                                          ? Colors.transparent
-                                          : Colors.black.withOpacity(0.25),
-                                    ),
-                                    onPressed: () => tradeDetailPageController
-                                        .switchYesNoOutcome(false),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          child: Text("No",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        SizedBox(
-                                            width: 37,
-                                            height: 25,
-                                            child: Text(
-                                              "${58}F",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ))
-                                      ],
-                                    )),
-                              ),
-                            ],
+                          SizedBox(
+                            width: 10.0,
                           ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [],
+                          Text(
+                            tradeDetailPageController.eventDetail.title!,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                    )
+                      const SizedBox(height: 20),
+                      // Diagram Place
+                      Container(
+                        width: 345,
+                        height: 313,
+                        alignment: Alignment.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Yes No diagram switcher
+                            SizedBox(
+                              width: 200,
+                              child: CupertinoSlidingSegmentedControl(
+                                children: {
+                                  0: Text("Yes"),
+                                  1: Text("No"),
+                                },
+                                groupValue: tradeDetailPageController
+                                    .slidingYesNoDiagram,
+                                onValueChanged: (int? newValue) {
+                                  tradeDetailPageController
+                                      .switchDiagram(newValue!);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Expanded(
+                                child: Container(
+                              alignment: Alignment.center,
+                              child: Text("Yes/No Diagram"),
+                            ))
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Buy Sell position and Price Amount input
+                      Container(
+                          width: 370,
+                          height: 350,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15.0, horizontal: 16.0),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(6)),
+                              gradient: LinearGradient(
+                                colors: [Colors.white, Color(0xFFFFE797)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                stops: [0, 0.9],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: const Offset(4, 4),
+                                ),
+                              ]),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Buy Sell position button
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 150,
+                                        child: CupertinoSlidingSegmentedControl(
+                                          children: {
+                                            0: Text("Buy"),
+                                            1: Text("Sell"),
+                                          },
+                                          groupValue: tradeDetailPageController
+                                              .slidingPosition,
+                                          onValueChanged: (int? newValue) {
+                                            tradeDetailPageController
+                                                .switchPosition(newValue!);
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 150,
+                                        child: CupertinoSlidingSegmentedControl(
+                                            groupValue:
+                                                tradeDetailPageController
+                                                    .slidingYesNoOutcome,
+                                            children: {
+                                              0: Text("Yes"),
+                                              1: Text("No")
+                                            },
+                                            onValueChanged: (newValue) {
+                                              tradeDetailPageController
+                                                  .switchYesNoOutcome(newValue);
+                                            }),
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      // Amount user input side
+                                      SizedBox(
+                                        height: 110,
+                                        width: 160,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                "Amount",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 2.0,
+                                            ),
+                                            Container(
+                                                height: 50,
+                                                width: 124,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.25),
+                                                      ),
+                                                      BoxShadow(
+                                                        color: Colors.white,
+                                                        spreadRadius: -1.0,
+                                                        blurRadius: 3.0,
+                                                      )
+                                                    ]),
+                                                child: TextField(
+                                                  controller:
+                                                      tradeDetailPageController
+                                                          .amountTextController,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                  ),
+                                                  onTapOutside: (event) =>
+                                                      FocusScope.of(context)
+                                                          .unfocus(),
+                                                  onChanged: (value) =>
+                                                      tradeDetailPageController
+                                                          .amountTextControllerOnChange(
+                                                              value),
+                                                )),
+                                            SizedBox(
+                                              height: 5.0,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                    width: 34,
+                                                    height: 25,
+                                                    child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            padding: EdgeInsets
+                                                                .zero,
+                                                            backgroundColor: Color(
+                                                                    0xFF77ABFF)
+                                                                .withOpacity(
+                                                                    0.8),
+                                                            shadowColor:
+                                                                Colors.black,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10.0))),
+                                                        onPressed: () =>
+                                                            tradeDetailPageController
+                                                                .increAmount(1),
+                                                        child: Text(
+                                                          "+1",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ))),
+                                                SizedBox(
+                                                    width: 34,
+                                                    height: 25,
+                                                    child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            padding: EdgeInsets
+                                                                .zero,
+                                                            backgroundColor: Color(
+                                                                    0xFF5596FF)
+                                                                .withOpacity(
+                                                                    0.8),
+                                                            shadowColor:
+                                                                Colors.black,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10.0))),
+                                                        onPressed: () =>
+                                                            tradeDetailPageController
+                                                                .increAmount(5),
+                                                        child: Text(
+                                                          "+5",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ))),
+                                                SizedBox(
+                                                    width: 34,
+                                                    height: 25,
+                                                    child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            backgroundColor:
+                                                                Color(0xFF3B86FF)
+                                                                    .withOpacity(
+                                                                        0.8),
+                                                            shadowColor:
+                                                                Colors.black,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        10.0))),
+                                                        onPressed: () =>
+                                                            tradeDetailPageController
+                                                                .increAmount(
+                                                                    10),
+                                                        child: Text(
+                                                          "+10",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ))),
+                                                SizedBox(
+                                                    width: 34,
+                                                    height: 25,
+                                                    child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            backgroundColor:
+                                                                Color(0xFF2679FF)
+                                                                    .withOpacity(
+                                                                        0.8),
+                                                            shadowColor:
+                                                                Colors.black,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        10.0))),
+                                                        onPressed: () =>
+                                                            tradeDetailPageController
+                                                                .increAmount(
+                                                                    50),
+                                                        child: Text(
+                                                          "+50",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )))
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // Price user input side
+                                      SizedBox(
+                                        height: 110,
+                                        width: 160,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                "Price",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            Container(
+                                                height: 50,
+                                                width: 124,
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.25),
+                                                      ),
+                                                      BoxShadow(
+                                                        color: Colors.white,
+                                                        spreadRadius: -1.0,
+                                                        blurRadius: 3.0,
+                                                      )
+                                                    ]),
+                                                child: TextField(
+                                                  enabled:
+                                                      tradeDetailPageController
+                                                              .eventDetail
+                                                              .marketState ==
+                                                          MarketState.active,
+                                                  controller:
+                                                      tradeDetailPageController
+                                                          .priceTextController,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                  ),
+                                                  onTapOutside: (event) =>
+                                                      FocusScope.of(context)
+                                                          .unfocus(),
+                                                  onChanged: tradeDetailPageController
+                                                              .eventDetail
+                                                              .marketState ==
+                                                          MarketState.active
+                                                      ? (value) =>
+                                                          tradeDetailPageController
+                                                              .priceTextControllerOnChange(
+                                                                  value)
+                                                      : (value) {},
+                                                )),
+                                            Expanded(
+                                                child: Slider(
+                                                    value:
+                                                        tradeDetailPageController
+                                                            .price,
+                                                    min:
+                                                        tradeDetailPageController
+                                                            .minPrice,
+                                                    max:
+                                                        tradeDetailPageController
+                                                            .maxPrice,
+                                                    onChanged: tradeDetailPageController
+                                                                .eventDetail
+                                                                .marketState ==
+                                                            MarketState.active
+                                                        ? (value) =>
+                                                            tradeDetailPageController
+                                                                .priceTextControllerOnChange(
+                                                                    value
+                                                                        .toString())
+                                                        : (value) {})),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+
+                                  Divider(
+                                    color: Color(0xFF2C76EE).withOpacity(0.8),
+                                    thickness: 2.0,
+                                  ),
+
+                                  SizedBox(
+                                    height: 80,
+                                    width: 340,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text("Total Cost",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            const SizedBox(
+                                              width: 5.0,
+                                            ),
+                                            Tooltip(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.25),
+                                                      spreadRadius: 0,
+                                                      blurRadius: 4,
+                                                      offset:
+                                                          const Offset(4, 4),
+                                                    ),
+                                                  ]),
+                                              message:
+                                                  "Total Cost: \n${tradeDetailPageController.amount} (amount) * \n${tradeDetailPageController.price} (price) * \n${tradeDetailPageController.fee + 1} (fee) \n= ${tradeDetailPageController.totalCost.toStringAsFixed(2)}",
+                                              textStyle: TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                              child: Icon(Icons.info_outline,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              height: 52,
+                                              width: 80,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "amount ${tradeDetailPageController.amount}",
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xFF666666),
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                  ),
+                                                  Text(
+                                                    "price ${tradeDetailPageController.price}",
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xFF666666),
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                  ),
+                                                  Text(
+                                                      "fee ${tradeDetailPageController.fee}",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF666666),
+                                                          fontSize: 11,
+                                                          fontWeight: FontWeight
+                                                              .normal))
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 46,
+                                              width: 217,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10.0)),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.25),
+                                                    ),
+                                                    BoxShadow(
+                                                      color: Colors.white,
+                                                      spreadRadius: -1.0,
+                                                      blurRadius: 5.0,
+                                                    )
+                                                  ]),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                      child: Text(
+                                                    "${tradeDetailPageController.totalCost.toStringAsFixed(2)}  𝟊",
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                    textAlign: TextAlign.center,
+                                                  )),
+                                                  Container(
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 5.0),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: SizedBox(
+                                      height: 40,
+                                      width: 200,
+                                      child: ElevatedButton(
+                                          onPressed: tradeDetailPageController
+                                              .purchaseRequestSent,
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Color(0xFF2C76EE)
+                                                  .withOpacity(0.8),
+                                              shadowColor: Colors.black,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0))),
+                                          child: Text(
+                                            tradeDetailPageController
+                                                    .isBuyingPosition
+                                                ? "Purchase"
+                                                : "Sell",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              if (tradeDetailPageController
+                                  .purchaseRequestSending)
+                                Positioned(
+                                    height: 345,
+                                    width: 340,
+                                    child: Container(
+                                      width: 340,
+                                      height: 350,
+                                      color: Colors.grey.withOpacity(0.4),
+                                      alignment: Alignment.center,
+                                      child: CircularProgressIndicator(),
+                                    ))
+                            ],
+                          ))
+                    ]
                   ],
                 ),
               ),

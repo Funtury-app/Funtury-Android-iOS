@@ -26,6 +26,7 @@ class PredictionMarketContract {
   ContractFunction resolutionTime() => contract.function("resolutionTime");
   ContractFunction preOrderTime() => contract.function("preOrderTime");
   ContractFunction funturyContract() => contract.function("funturyContract");
+  ContractFunction getMarketInfo() => contract.function("getMarketInfo");
 
   // Market state functions
   ContractFunction state() => contract.function("state");

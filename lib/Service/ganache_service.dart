@@ -13,11 +13,12 @@ import 'package:web3dart/web3dart.dart';
 // import 'package:bip39/bip39.dart' as bip39;
 
 class GanacheService {
-  static const String _rpcUrl = "https://cab0-120-126-194-245.ngrok-free.app";
+  static const String _rpcUrl =
+      "https://36c3-2001-b400-e3e7-323c-e965-e611-9c7c-2c30.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
-      "0x5a6e7d345770f89593791ea4aab8882dd2e8c3ca6e3219d5c4a82de775f0341a");
+      "0x6c78d6e98f7f04d8a31abb047ea6f702c188b20c2380dcf33f9c883e794e5a47");
   static final EthereumAddress userAddress =
-      EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD");
+      EthereumAddress.fromHex("0x57EE88b007F83cfD00743f7F2C88FD1826F26ed7");
 
   late Client httpClient;
   late Web3Client ganacheClient;
@@ -149,22 +150,97 @@ class GanacheService {
 
   /// Prediction contract transfer function ///
 
-  Future<(double, double)> getUserPosition(EthereumAddress marketAddress) async {
+  Future<(double, double)> getUserPosition(
+      EthereumAddress marketAddress) async {
     PredictionMarketContract predictionMarketContract =
         PredictionMarketContract(contractAddress: marketAddress);
 
-    try{
-      
+    try {
       final result = await ganacheClient.call(
           contract: predictionMarketContract.contract,
           function: predictionMarketContract.getUserShares(),
           params: [userAddress]);
       debugPrint("GanacheService getUserPosition result: $result");
-      
-      return ((result[0] as BigInt).toDouble(), (result[1] as BigInt).toDouble());
-    } catch(e){
+
+      return (
+        (result[0] as BigInt).toDouble(),
+        (result[1] as BigInt).toDouble()
+      );
+    } catch (e) {
       debugPrint("GanacheService getUserPosition error: $e");
       return (0.0, 0.0);
+    }
+  }
+
+  Future<Map<String, dynamic>?> getMarketInfo(
+      EthereumAddress marketAddress) async {
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+
+    Map<String, dynamic>? data;
+
+    try {
+      final result = await ganacheClient.call(
+          contract: predictionMarketContract.contract,
+          function: predictionMarketContract.getMarketInfo(),
+          params: []);
+
+      data = {
+        "title": result[0] as String,
+        "createTime": result[1] as BigInt,
+        "resolutionTime": result[2] as BigInt,
+        "preOrderTime": result[3] as BigInt,
+        "funturyContract": result[4] as EthereumAddress,
+        "owner": result[5] as EthereumAddress,
+        "marketState": (result[6] as BigInt).toInt(),
+        "resolvedToYes": result[7] as bool,
+        "remainYesShares": result[8] as BigInt,
+        "remainNoShares": result[9] as BigInt,
+        "initialPrice": result[10] as BigInt,
+      };
+      debugPrint("GanacheService getMarketInfo result: $data");
+    } catch (e) {
+      debugPrint("GanacheService getMarketInfo error: $e");
+    }
+
+    return data;
+  }
+
+  Future<(bool, String)> preorderPurchase(EthereumAddress marketAddress,
+      bool isYes, double price, int amount) async {
+    try {
+      final userBalance = await getBalance();
+      if (userBalance < amount * price) {
+        debugPrint(
+            "GanacheService preorderPurchase error: Insufficient balance");
+        return (false, "Insufficient balance");
+      }
+    } catch (e) {
+      debugPrint("GanacheService preorderPurchase error: $e");
+      return (false, "Error checking balance");
+    }
+
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+
+    try {
+      final tx = await ganacheClient.signTransaction(
+          _privateKey,
+          Transaction(
+            from: _privateKey.address,
+            gasPrice: EtherAmount.inWei(BigInt.from(20000000000)),
+            maxGas: 100000,
+            value: EtherAmount.zero(),
+            to: marketAddress,
+            data: predictionMarketContract.preOrderTransfer().encodeCall(
+                [userAddress, isYes, BigInt.from(price * 1e18), BigInt.from(amount)]),
+          ),
+          chainId: 1337);
+      await ganacheClient.sendRawTransaction(tx);
+      return (true, "Preorder purchase success");
+    } catch (e) {
+      debugPrint("GanacheService preorderPurchase error: $e");
+      return (false, "Preorder purchase failed");
     }
   }
 

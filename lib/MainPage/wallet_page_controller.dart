@@ -34,8 +34,9 @@ class WalletPageController {
 
     try {
       getAllUserPosition();
-      // final result = await ganacheService.getBalance();
-      balance = 20.0;
+      final result = await ganacheService.getBalance();
+      balance = result;
+      // balance = 20.0;
       alreadyClaimed = await ganacheService.checkFreeTokenClaimed();
       walletAddress = GanacheService.userAddress;
     } catch (e) {
@@ -56,17 +57,17 @@ class WalletPageController {
     });
 
     try {
-      // final marketAddress = await ganacheService.queryAllMarket();
+      final marketAddress = await ganacheService.queryAllMarket();
 
-      // for (var address in marketAddress) {
-      //   final result = await ganacheService.getUserPosition(address);
-      //   if (result.$1 != 0 || result.$2 != 0) {
-      //     userPosition[address] = result;
-      //   }
-      // }
-      userPosition[
-          EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD")] =
-          (20.0, 80.0);
+      for (var address in marketAddress) {
+        final result = await ganacheService.getUserPosition(address);
+        if (result.$1 != 0 || result.$2 != 0) {
+          userPosition[address] = result;
+        }
+      }
+      // userPosition[
+      //     EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD")] =
+      //     (20.0, 80.0);
 
       debugPrint("WalletPageController getAllUserPosition success");
     } catch (e) {

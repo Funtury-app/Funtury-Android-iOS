@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:web3dart/credentials.dart';
+import 'package:funtury/Data/event_detail.dart';
+import 'package:funtury/Service/ganache_service.dart';
+import 'package:reown_appkit/modal/pages/preview_send/utils.dart';
+import 'package:reown_appkit/reown_appkit.dart';
 
 class TradeDetailPageController {
   TradeDetailPageController(
@@ -7,22 +10,103 @@ class TradeDetailPageController {
       required this.setState,
       required this.marketAddress});
 
+  final ganacheService = GanacheService();
+  EventDetail eventDetail = EventDetail.initFromDefault();
+
   late BuildContext context;
   late void Function(VoidCallback) setState;
   late EthereumAddress marketAddress;
 
+  TextEditingController amountTextController = TextEditingController();
+  TextEditingController priceTextController = TextEditingController();
+
   bool isYesDiagram = true;
   bool isBuyingPosition = true;
   bool isYesPosition = true;
+
   bool marketInfoLoading = false;
+  bool purchaseRequestSending = false;
+
+  double price = 0.5;
+  double maxPrice = 1.0;
+  double minPrice = 0.0;
+
+  int amount = 0;
+  int maxAmount = 999;
+  int minAmount = 0;
+
+  double fee = 0.1;
+
+  double get totalCost {
+    return (amount * price) * (1 + fee);
+  }
 
   int slidingYesNoDiagram = 0;
   int slidingPosition = 0;
+  int slidingYesNoOutcome = 0;
 
   Future<void> init() async {
+    amountTextController.text = amount.toString();
+    priceTextController.text = price.toStringAsFixed(2);
+
     setState(() {
       marketInfoLoading = true;
     });
+
+    // Market info loading logic here
+    try {
+      final data = await ganacheService.getMarketInfo(marketAddress);
+      eventDetail = EventDetail.initFromData(data);
+
+      // final data = {
+      //       "title": "Market Title",
+      //       "createTime":
+      //           BigInt.from(DateTime.now().millisecondsSinceEpoch / 1000),
+      //       "resolutionTime": BigInt.from(DateTime.now()
+      //               .add(const Duration(days: 2))
+      //               .millisecondsSinceEpoch /
+      //           1000),
+      //       "preOrderTime": BigInt.from(DateTime.now()
+      //               .add(const Duration(days: 1))
+      //               .millisecondsSinceEpoch /
+      //           1000),
+      //       "funturyContract": marketAddress,
+      //       "owner": marketAddress,
+      //       "resolvedToYes": false,
+      //       "marketState": 0,
+      //       "remainYesShares": BigInt.from(1000),
+      //       "remainNoShares": BigInt.from(500),
+      //       "initialPrice": BigInt.from(0.5),
+      //     },
+      //     eventDetail = EventDetail.initFromData(data);
+      // await Future.delayed(const Duration(seconds: 2));
+
+      debugPrint("Market info: $data");
+    } catch (e) {
+      if (context.mounted) {
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content:
+                    const Text("Failed to load market info. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+      debugPrint("Market info loading error: $e");
+    }
 
     setState(() {
       marketInfoLoading = false;
@@ -33,7 +117,7 @@ class TradeDetailPageController {
     if (newValue == null) return;
     setState(() {
       slidingYesNoDiagram = newValue;
-      isYesDiagram = newValue == 0 ? true : false;
+      isYesDiagram = newValue == 0;
     });
   }
 
@@ -42,13 +126,121 @@ class TradeDetailPageController {
 
     setState(() {
       slidingPosition = newValue;
-      isBuyingPosition = newValue == 0 ? true : false;
+      isBuyingPosition = newValue == 0;
     });
   }
 
-  void switchYesNoOutcome(bool isYes) {
+  void switchYesNoOutcome(int? newValue) {
+    if (newValue == null) return;
     setState(() {
-      isYesPosition = isYes;
+      slidingYesNoOutcome = newValue;
+      isYesPosition = newValue == 0;
     });
+  }
+
+  void increAmount(int value) {
+    setState(() {
+      amount += value;
+      if (amount < 0) {
+        amount = 0;
+      }
+      amountTextController.text = amount.toString();
+    });
+  }
+
+  void amountTextControllerOnChange(String value) {
+    if (value.toInt()! > maxAmount) {
+      amountTextController.text = maxAmount.toString();
+    } else if (value.toInt()! < minAmount) {
+      amountTextController.text = minAmount.toString();
+    } else {
+      amountTextController.text = value;
+    }
+    amount = amountTextController.text.toInt()!;
+    setState(() {});
+  }
+
+  void priceTextControllerOnChange(String value) {
+    double inputValue = value.toDouble().toStringAsFixed(2).toDouble();
+    if (inputValue > maxPrice) {
+      priceTextController.text = maxPrice.toStringAsFixed(2);
+    } else if (inputValue < minPrice) {
+      priceTextController.text = minPrice.toString();
+    } else {
+      priceTextController.text = inputValue.toString();
+    }
+    price = priceTextController.text.toDouble();
+    setState(() {});
+  }
+
+  Future purchaseRequestSent() async {
+    if (purchaseRequestSending) return;
+    setState(() {
+      purchaseRequestSending = true;
+    });
+
+    try {
+      if (eventDetail.marketState == MarketState.preorder) {
+        final result = await ganacheService.preorderPurchase(
+            marketAddress, isYesPosition, price, amount);
+        if (result.$1) {
+          if (context.mounted) {
+            await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Success"),
+                    content: const Text("Preorder purchase success."),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("OK"),
+                      ),
+                    ],
+                  );
+                });
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
+          }
+        } else {
+          throw Exception("Preorder purchase failed");
+        }
+      } else if (eventDetail.marketState == MarketState.active) {
+        // Call backend to create order to order book
+        await Future.delayed(Duration(seconds: 2));
+      } else {
+        throw Exception("Invalid market state");
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content: const Text(
+                    "Failed to send purchase request. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+      }
+      debugPrint("Sending purchase request failed: ${e.toString()}");
+    }
+
+    if (context.mounted) {
+      setState(() {
+        purchaseRequestSending = false;
+      });
+    }
   }
 }

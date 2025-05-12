@@ -511,6 +511,37 @@ class ContractAbiJson {
             {
               "indexed": true,
               "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "totalCost",
+              "type": "uint256"
+            }
+          ],
+          "name": "NoTransaction",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
               "name": "user",
               "type": "address"
             },
@@ -536,60 +567,29 @@ class ContractAbiJson {
             {
               "indexed": true,
               "internalType": "address",
-              "name": "market",
+              "name": "from",
               "type": "address"
             },
             {
               "indexed": true,
               "internalType": "address",
-              "name": "buyer",
+              "name": "to",
               "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "isYes",
-              "type": "bool"
             },
             {
               "indexed": false,
               "internalType": "uint256",
               "name": "amount",
               "type": "uint256"
-            }
-          ],
-          "name": "SharesPurchased",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "market",
-              "type": "address"
             },
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "yesAmount",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "noAmount",
+              "name": "totalCost",
               "type": "uint256"
             }
           ],
-          "name": "UserPositionUpdated",
+          "name": "YesTransaction",
           "type": "event"
         },
         {
@@ -647,6 +647,53 @@ class ContractAbiJson {
           "name": "getInitialPrice",
           "outputs": [
             {"internalType": "uint256", "name": "price", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getMarketInfo",
+          "outputs": [
+            {"internalType": "string", "name": "_title", "type": "string"},
+            {
+              "internalType": "uint256",
+              "name": "_createTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_resolutionTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_preOrderTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "_funturyContract",
+              "type": "address"
+            },
+            {"internalType": "address", "name": "_owner", "type": "address"},
+            {"internalType": "int256", "name": "_IntState", "type": "int256"},
+            {"internalType": "bool", "name": "_resolvedToYes", "type": "bool"},
+            {
+              "internalType": "uint256",
+              "name": "_initialYesShares",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_initialNoShares",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_initialPrice",
+              "type": "uint256"
+            }
           ],
           "stateMutability": "view",
           "type": "function"

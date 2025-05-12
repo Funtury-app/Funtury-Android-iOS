@@ -1,9 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:funtury/Service/wallet_service.dart';
 import 'package:funtury/route_map.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 void main() {
@@ -20,36 +18,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        // ChangeNotifierProvider(create: (_) => WalletService())
-      ],
-      child: MaterialApp(
-        title: 'Funtury',
-        debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,
-        theme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFFFFD030),
-            primary: const Color(0xFFFFD030),
-            secondary: const Color(0xFF000000),
-            tertiary: const Color(0xFFFFFFFF),
-          ),
-          textTheme:
-              GoogleFonts.instrumentSansTextTheme(Theme.of(context).textTheme),
-          useMaterial3: true,
-        ).copyWith(
-            pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
-            TargetPlatform.iOS: FadeThroughPageTransitionsBuilder(),
-            TargetPlatform.linux: FadeThroughPageTransitionsBuilder(),
-            TargetPlatform.windows: FadeThroughPageTransitionsBuilder(),
-          },
-        )),
-        routes: RouteMap.routes,
-        initialRoute: RouteMap.loginPage,
-      ),
+    // return MultiProvider(
+    //   providers: [
+    //     // ChangeNotifierProvider(create: (_) => WalletService())
+    //   ],
+    //   child:
+    return MaterialApp(
+      title: 'Funtury',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFFD030),
+          primary: const Color(0xFFFFD030),
+          secondary: const Color(0xFF000000),
+          tertiary: const Color(0xFFFFFFFF),
+        ),
+        textTheme:
+            GoogleFonts.instrumentSansTextTheme(Theme.of(context).textTheme),
+        useMaterial3: true,
+      ).copyWith(
+          pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
+          TargetPlatform.iOS: FadeThroughPageTransitionsBuilder(),
+          TargetPlatform.linux: FadeThroughPageTransitionsBuilder(),
+          TargetPlatform.windows: FadeThroughPageTransitionsBuilder(),
+        },
+      )),
+      routes: RouteMap.routes,
+      initialRoute: RouteMap.homePage,
     );
+    // );
   }
 }

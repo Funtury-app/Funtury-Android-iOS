@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:funtury/Data/browser_event.dart';
 import 'package:funtury/Service/ganache_service.dart';
@@ -17,41 +19,63 @@ class BrowserPageController {
 
   List<EthereumAddress> marketAddresses = [];
 
-  Future<void> getAllMarkets() async{
+  bool isLoading = false;
+
+  Future<void> getAllMarkets() async {
     marketAddresses = await ganacheService.queryAllMarket();
     return;
   }
 
-  Future<void> init() async{
-    // final result = await Future.wait([
-    //   ganacheService.queryAllMarket(),
-    // ]);
-    // marketAddresses = result[0];
+  Future<void> init() async {
+    if(isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
+    
+    try {
+      final result = await Future.wait([
+        ganacheService.queryAllMarket(),
+      ]);
+      marketAddresses = result[0];
 
-    // for(int i = 0 ; i < marketAddresses.length ;i ++){
-    //   events.add(BrowserEvent(marketAddress: marketAddresses[i], yesProbability: Random().nextInt(100), noProbability: Random().nextInt(100)));
-    // }
+      for (int i = 0; i < marketAddresses.length; i++) {
+        events.add(BrowserEvent(
+            marketAddress: marketAddresses[i],
+            yesProbability: Random().nextInt(100),
+            noProbability: Random().nextInt(100)));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content:
+                    const Text("Failed to load market data. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+      }
+      debugPrint("BrowserPageController init error: $e");
+    }
 
-    events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 20, noProbability: 80));
-    events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 40, noProbability: 60));
+    // events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 20, noProbability: 80));
+    // events.add(BrowserEvent(marketAddress: EthereumAddress.fromHex("0x82Be6C4b686dF7908aB0771f18b4e3C134e923FD"), yesProbability: 40, noProbability: 60));
 
-    if(
-      context.mounted){
-      setState(() {});
+    if (context.mounted) {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  Future<void> refresh() async{
-
-  }
-  
+  Future<void> refresh() async {}
 }
-
-  // Future<void> logoutWallet() async {
-  //   appKitModal.disconnect().then((value) {
-  //     if (appKitModal.isConnected && context.mounted) {
-  //       Navigator.of(context).pushReplacementNamed(RouteMap.loginPage);
-  //     }
-  //   });
-  //   return;
-  // }
