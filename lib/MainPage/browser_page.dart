@@ -146,7 +146,7 @@ class _EventCardState extends State<EventCard> {
           Navigator.pushNamed(
             context,
             RouteMap.tradeDetailPage,
-            arguments: widget.event.marketAddress,
+            arguments: (widget.event.marketAddress, null, null),
           );
         },
         child: Container(

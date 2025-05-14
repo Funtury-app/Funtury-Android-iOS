@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:funtury/Data/wallet_event.dart';
 import 'package:funtury/MainPage/wallet_page_controller.dart';
-import 'package:web3dart/credentials.dart';
+import 'package:funtury/route_map.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
@@ -171,7 +171,9 @@ class _WalletPageState extends State<WalletPage> {
                                   : ListView.builder(
                                       itemBuilder: (_, index) {
                                         return PositionCard(
-                                          event: walletPageController.userPosition[index],
+                                          event: walletPageController
+                                              .userPosition[index],
+                                          walletPageController: walletPageController,
                                         );
                                       },
                                       itemCount: walletPageController
@@ -181,11 +183,10 @@ class _WalletPageState extends State<WalletPage> {
 }
 
 class PositionCard extends StatefulWidget {
-  const PositionCard(
-      {super.key,
-      required this.event});
+  const PositionCard({super.key, required this.event, required this.walletPageController});
 
   final WalletEvent event;
+  final WalletPageController walletPageController;
 
   @override
   State<PositionCard> createState() => _PositionCardState();
@@ -194,139 +195,148 @@ class PositionCard extends StatefulWidget {
 class _PositionCardState extends State<PositionCard> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 355,
-      height: 90,
-      padding: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-              width: 180,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.event.title,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.fade,
-                    textAlign: TextAlign.left,
-                  ),
-                  Text(
-                    "Preorder Time: ${widget.event.preOrderTime.year}.${widget.event.preOrderTime.month}.${widget.event.preOrderTime.day}",
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 10,
-                        fontWeight: FontWeight.normal),
-                  ),
-                  Text(
-                    "Resolve Time: ${widget.event.resolutionTime.year}.${widget.event.resolutionTime.month}.${widget.event.resolutionTime.day}",
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 10,
-                        fontWeight: FontWeight.normal),
-                  )
-                ],
-              )),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    margin: const EdgeInsets.only(right: 5),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Text(
-                      "Yes",
+    return GestureDetector(
+      onTap: () async {
+        final int? addBalance = await Navigator.of(context)
+            .pushNamed(RouteMap.tradeDetailPage, arguments: (widget.event.marketAddress, widget.event.yesShares, widget.event.noShares));
+        if(addBalance != null){
+          widget.walletPageController.updateBalance(widget.walletPageController.balance + addBalance);
+        }
+      },
+      child: Container(
+        width: 355,
+        height: 90,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+                width: 180,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.event.title,
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+                          color: Colors.black,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.fade,
+                      textAlign: TextAlign.left,
                     ),
-                  ),
-                  SizedBox(
-                    width: 40,
-                    height: 25,
-                    child: Container(
+                    Text(
+                      "Preorder Time: ${widget.event.preOrderTime.year}.${widget.event.preOrderTime.month}.${widget.event.preOrderTime.day}",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal),
+                    ),
+                    Text(
+                      "Resolve Time: ${widget.event.resolutionTime.year}.${widget.event.resolutionTime.month}.${widget.event.resolutionTime.day}",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                          fontWeight: FontWeight.normal),
+                    )
+                  ],
+                )),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      margin: const EdgeInsets.only(right: 5),
                       alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
                       child: Text(
-                        widget.event.yesShares.toString(),
+                        "Yes",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
+                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    margin: const EdgeInsets.only(right: 5),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    child: Text(
-                      "No",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 40,
-                    height: 25,
-                    child: Container(
+                    SizedBox(
+                      width: 40,
+                      height: 25,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          widget.event.yesShares.toString(),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      margin: const EdgeInsets.only(right: 5),
                       alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
                       child: Text(
-                        widget.event.noShares.toString(),
+                        "No",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
+                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  )
-                ],
-              )
-            ],
-          )
-        ],
+                    SizedBox(
+                      width: 40,
+                      height: 25,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          widget.event.noShares.toString(),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

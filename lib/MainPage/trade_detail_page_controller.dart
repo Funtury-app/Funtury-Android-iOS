@@ -8,7 +8,9 @@ class TradeDetailPageController {
   TradeDetailPageController(
       {required this.context,
       required this.setState,
-      required this.marketAddress});
+      required this.marketAddress,
+      this.userYesPosition,
+      this.userNoPosition});
 
   final ganacheService = GanacheService();
   EventDetail eventDetail = EventDetail.initFromDefault();
@@ -26,6 +28,7 @@ class TradeDetailPageController {
 
   bool marketInfoLoading = false;
   bool purchaseRequestSending = false;
+  bool rewardClaiming = false;
 
   double price = 0.5;
   double maxPrice = 1.0;
@@ -44,6 +47,9 @@ class TradeDetailPageController {
   int slidingYesNoDiagram = 0;
   int slidingPosition = 0;
   int slidingYesNoOutcome = 0;
+
+  int? userYesPosition;
+  int? userNoPosition;
 
   Future<void> init() async {
     amountTextController.text = amount.toString();
@@ -80,7 +86,14 @@ class TradeDetailPageController {
       //     },
       //     eventDetail = EventDetail.initFromData(data);
       // await Future.delayed(const Duration(seconds: 2));
-
+      if (eventDetail.marketState == MarketState.resolved &&
+          userYesPosition == null &&
+          userNoPosition == null) {
+        await ganacheService.getUserPosition(marketAddress).then((value) {
+          userYesPosition = value.$1.toInt();
+          userNoPosition = value.$2.toInt();
+        });
+      }
       debugPrint("Market info: $data");
     } catch (e) {
       if (context.mounted) {
@@ -240,6 +253,92 @@ class TradeDetailPageController {
     if (context.mounted) {
       setState(() {
         purchaseRequestSending = false;
+      });
+    }
+  }
+
+  Future<void> claimedReward() async {
+    if (rewardClaiming) return;
+    setState(() {
+      rewardClaiming = true;
+    });
+
+    try {
+      final result =
+          await ganacheService.claimRewardFromMarketRequest(marketAddress);
+
+      if (context.mounted) {
+        if (result.$1) {
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Success"),
+                  content: const Text("Claimed reward success."),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                );
+              });
+          if (context.mounted) {
+            Navigator.of(context).pop(userYesPosition);
+          }
+        } else {
+          if (result.$2 == "Already claimed") {
+            await showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Error"),
+                    content: const Text("You have already claimed the reward."),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("OK"),
+                      ),
+                    ],
+                  );
+                });
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
+          }
+          throw Exception("Claiming reward failed");
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content:
+                    const Text("Failed to claim reward. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+      }
+      debugPrint("Claiming reward failed: ${e.toString()}");
+    }
+
+    if (context.mounted) {
+      setState(() {
+        rewardClaiming = false;
       });
     }
   }

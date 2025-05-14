@@ -15,9 +15,12 @@ class RouteMap {
     loginPage: (context) => const LoginPage(),
     homePage: (context) => const Homepage(),
     tradeDetailPage: (context) {
-      final EthereumAddress marketAddress =
-          ModalRoute.of(context)?.settings.arguments as EthereumAddress;
-      return TradeDetailPage(marketAddress: marketAddress);
+      final EthereumAddress marketAddress;
+      final int? userYesPosition;
+      final int? userNoPosition;
+      (marketAddress, userYesPosition, userNoPosition) =
+          ModalRoute.of(context)?.settings.arguments as (EthereumAddress, int?, int?);
+      return TradeDetailPage(marketAddress: marketAddress, userYesShares: userYesPosition, userNoShares: userNoPosition,);
     },
   };
 }

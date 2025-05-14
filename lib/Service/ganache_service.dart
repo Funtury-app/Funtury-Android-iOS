@@ -7,6 +7,7 @@ import 'package:funtury/Service/Contract/prediction_market_contract.dart';
 // import 'package:funtury/Service/Contract/contract_address.dart';
 import 'package:http/http.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/json_rpc.dart';
 import 'package:web3dart/web3dart.dart';
 // import 'package:reown_appkit/solana/solana_common/src/converters/hex_codec.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -15,11 +16,11 @@ import 'package:web3dart/web3dart.dart';
 
 class GanacheService {
   static const String _rpcUrl =
-      "https://36c3-2001-b400-e3e7-323c-e965-e611-9c7c-2c30.ngrok-free.app";
+      "https://d241-2001-b400-e3ac-4100-d81d-deea-7056-80bb.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
-      "0x21748d9e0ece7fb31349a8f97cbbf9781339b687db673023a90d53cfcb3de404");
+      "0xd1659c1e6db804d140b9767226bb9d371fb7b062e64251bfe654b2a0628b9e3f");
   static final EthereumAddress userAddress =
-      EthereumAddress.fromHex("0x9555811b9e19A2843162C7C577A09bC52a7f2885");
+      EthereumAddress.fromHex("0x6B21C392F5aAD239f253aB4ed4a65d62fbbEEa99");
 
   late Client httpClient;
   late Web3Client ganacheClient;
@@ -263,6 +264,37 @@ class GanacheService {
     }
   }
 
+  Future<(bool, String)> claimRewardFromMarketRequest(EthereumAddress marketAddress) async{
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+
+    try {
+      final tx = await ganacheClient.signTransaction(
+          _privateKey,
+          Transaction(
+            from: _privateKey.address,
+            gasPrice: EtherAmount.inWei(BigInt.from(20000000000)),
+            maxGas: 100000,
+            value: EtherAmount.zero(),
+            to: marketAddress,
+            data: predictionMarketContract.claimReward().encodeCall([]),
+          ),
+          chainId: 1337);
+      await ganacheClient.sendRawTransaction(tx);
+      return (true, "Claim reward success");
+    } catch (e) {
+      if(e.runtimeType == RPCError){
+        e as RPCError;
+        if(e.data["reason"] == "Already claimed reward"){
+          return (false, "Already claimed reward");
+        }
+      }
+
+      debugPrint("GanacheService claimRewardFromMarketRequest error: $e");
+      
+      return (false, "Claim reward failed");
+    }
+  }
   /// Prediction contract transfer function ///
 }
 

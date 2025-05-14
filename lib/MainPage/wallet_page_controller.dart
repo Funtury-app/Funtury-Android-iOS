@@ -24,7 +24,9 @@ class WalletPageController {
   bool positionLoading = false;
 
   void updateBalance(double newBalance) {
-    balance = newBalance;
+    setState(() {
+      balance = newBalance;
+    });
   }
 
   Future<void> init() async {
@@ -107,7 +109,7 @@ class WalletPageController {
             return AlertDialog(
               title: const Text("Claimed Free Token"),
               content:
-                  const Text("You have successfully claimed 500 free tokens!"),
+                  const Text("You have successfully claimed 50 free tokens!"),
               actions: [
                 TextButton(
                   onPressed: () {

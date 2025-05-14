@@ -6,9 +6,9 @@ class FunturyContract {
   static DeployedContract funturyContract = DeployedContract(
     ContractAbi.fromJson(
         jsonEncode(ContractAbiJson.funturyContractAbi), 'FunturyContract'),
-    EthereumAddress.fromHex("0x1c15e65e30FE33126f8A3829D9F5635925df0eBE"),
+    EthereumAddress.fromHex("0x46990239349c59Cf82aA140a9A18c063e3097706"),
   );
-  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x1c15e65e30FE33126f8A3829D9F5635925df0eBE");
+  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x46990239349c59Cf82aA140a9A18c063e3097706");
 
   // Main contract functions
   static ContractFunction claimFreeTokens = funturyContract.function('claimFreeTokens');

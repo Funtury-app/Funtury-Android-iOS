@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:funtury/Data/browser_event.dart';
 import 'package:funtury/Service/ganache_service.dart';
-import 'package:web3dart/credentials.dart';
 
 class BrowserPageController {
   BrowserPageController({
