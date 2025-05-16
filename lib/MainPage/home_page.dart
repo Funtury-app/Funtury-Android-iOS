@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funtury/MainPage/browser_page.dart';
 import 'package:funtury/MainPage/home_page_controller.dart';
+import 'package:funtury/MainPage/ranking_page.dart';
 import 'package:funtury/MainPage/wallet_page.dart';
 import 'package:funtury/assets_path.dart';
 
@@ -115,7 +116,7 @@ class _HomepageState extends State<Homepage> {
                           ),
                           LazyLoadPage(
                             shouldBuild: homePageController.hasVisited[1],
-                            builder: () => Text("News"),
+                            builder: () => RankingPage(),
                           ),
                           LazyLoadPage(
                             shouldBuild: homePageController.hasVisited[2],
@@ -173,13 +174,13 @@ class _HomepageState extends State<Homepage> {
                                   ),
                                   child: IconButton(
                                     icon: SvgPicture.asset(
-                                      AssetsPath.newsIcon,
+                                      AssetsPath.metalIcon,
                                       height: 35,
                                       width: 35,
                                       alignment: Alignment.center,
                                     ),
                                     onPressed: () => homePageController
-                                        .switchScreen(MainScreen.news),
+                                        .switchScreen(MainScreen.ranking),
                                   )),
                               Container(
                                   height: 57,
@@ -235,7 +236,7 @@ class _HomepageState extends State<Homepage> {
 
 enum MainScreen {
   browser(0),
-  news(1),
+  ranking(1),
   notificatoins(2),
   wallet(3);
 

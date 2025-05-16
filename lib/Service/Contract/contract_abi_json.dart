@@ -27,17 +27,94 @@ class ContractAbiJson {
           "type": "event"
         },
         {
-          "anonymous": false,
           "inputs": [
+            {"internalType": "address", "name": "spender", "type": "address"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "name": "approve",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "claimFreeTokens",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "string", "name": "title", "type": "string"},
             {
-              "indexed": false,
               "internalType": "uint256",
-              "name": "newAmount",
+              "name": "resolutionTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preOrderTime",
               "type": "uint256"
             }
           ],
-          "name": "FreeTokenAmountChanged",
-          "type": "event"
+          "name": "createMarket",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "spender", "type": "address"},
+            {
+              "internalType": "uint256",
+              "name": "subtractedValue",
+              "type": "uint256"
+            }
+          ],
+          "name": "decreaseAllowance",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "_from", "type": "address"},
+            {"internalType": "address", "name": "_to", "type": "address"},
+            {
+              "internalType": "address",
+              "name": "_marketaddress",
+              "type": "address"
+            },
+            {"internalType": "bool", "name": "_isYes", "type": "bool"},
+            {"internalType": "uint256", "name": "_amount", "type": "uint256"},
+            {
+              "internalType": "uint256",
+              "name": "_totalPrice",
+              "type": "uint256"
+            }
+          ],
+          "name": "emitTransferRecord",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "spender", "type": "address"},
+            {"internalType": "uint256", "name": "addedValue", "type": "uint256"}
+          ],
+          "name": "increaseAllowance",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
         },
         {
           "anonymous": false,
@@ -82,6 +159,59 @@ class ContractAbiJson {
             {
               "indexed": true,
               "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "marketContracts",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "isYes",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "totalPrice",
+              "type": "uint256"
+            }
+          ],
+          "name": "MarketTransferRecord",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "to", "type": "address"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "name": "mint",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
               "name": "user",
               "type": "address"
             },
@@ -94,6 +224,18 @@ class ContractAbiJson {
           ],
           "name": "TokensClaimed",
           "type": "event"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "to", "type": "address"},
+            {"internalType": "uint256", "name": "amount", "type": "uint256"}
+          ],
+          "name": "transfer",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
         },
         {
           "anonymous": false,
@@ -119,289 +261,6 @@ class ContractAbiJson {
           ],
           "name": "Transfer",
           "type": "event"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "owner", "type": "address"},
-            {"internalType": "address", "name": "spender", "type": "address"}
-          ],
-          "name": "allowance",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "spender", "type": "address"},
-            {"internalType": "uint256", "name": "amount", "type": "uint256"}
-          ],
-          "name": "approve",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "account", "type": "address"}
-          ],
-          "name": "balanceOf",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "marketAddr", "type": "address"}
-          ],
-          "name": "cancelMarket",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "claimFreeTokens",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "string", "name": "title", "type": "string"},
-            {
-              "internalType": "uint256",
-              "name": "resolutionTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "preOrderTime",
-              "type": "uint256"
-            }
-          ],
-          "name": "createMarket",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "decimals",
-          "outputs": [
-            {"internalType": "uint8", "name": "", "type": "uint8"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "spender", "type": "address"},
-            {
-              "internalType": "uint256",
-              "name": "subtractedValue",
-              "type": "uint256"
-            }
-          ],
-          "name": "decreaseAllowance",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "freeTokenAmount",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "getAllMarkets",
-          "outputs": [
-            {"internalType": "address[]", "name": "", "type": "address[]"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "uint256", "name": "index", "type": "uint256"}
-          ],
-          "name": "getMarketContract",
-          "outputs": [
-            {"internalType": "address", "name": "", "type": "address"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "getMarketCount",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "", "type": "address"}
-          ],
-          "name": "hasClaimedFreeTokens",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "spender", "type": "address"},
-            {"internalType": "uint256", "name": "addedValue", "type": "uint256"}
-          ],
-          "name": "increaseAllowance",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "marketAddress",
-              "type": "address"
-            }
-          ],
-          "name": "isMarketContract",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "", "type": "address"}
-          ],
-          "name": "isValidMarket",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "name": "marketContracts",
-          "outputs": [
-            {"internalType": "address", "name": "", "type": "address"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "to", "type": "address"},
-            {"internalType": "uint256", "name": "amount", "type": "uint256"}
-          ],
-          "name": "mint",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "name",
-          "outputs": [
-            {"internalType": "string", "name": "", "type": "string"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "owner",
-          "outputs": [
-            {"internalType": "address", "name": "", "type": "address"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "marketAddr",
-              "type": "address"
-            },
-            {"internalType": "bool", "name": "outcome", "type": "bool"}
-          ],
-          "name": "resolveMarket",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "uint256", "name": "_amount", "type": "uint256"}
-          ],
-          "name": "setFreeTokenAmount",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "symbol",
-          "outputs": [
-            {"internalType": "string", "name": "", "type": "string"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "totalFTSupply",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "totalSupply",
-          "outputs": [
-            {"internalType": "uint256", "name": "", "type": "uint256"}
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {"internalType": "address", "name": "to", "type": "address"},
-            {"internalType": "uint256", "name": "amount", "type": "uint256"}
-          ],
-          "name": "transfer",
-          "outputs": [
-            {"internalType": "bool", "name": "", "type": "bool"}
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
         },
         {
           "inputs": [
@@ -451,6 +310,169 @@ class ContractAbiJson {
             {"internalType": "bool", "name": "", "type": "bool"}
           ],
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "owner", "type": "address"},
+            {"internalType": "address", "name": "spender", "type": "address"}
+          ],
+          "name": "allowance",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "account", "type": "address"}
+          ],
+          "name": "balanceOf",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "decimals",
+          "outputs": [
+            {"internalType": "uint8", "name": "", "type": "uint8"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "freeTokenAmount",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getAllMarket",
+          "outputs": [
+            {"internalType": "address[]", "name": "", "type": "address[]"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "uint256", "name": "index", "type": "uint256"}
+          ],
+          "name": "getMarketContract",
+          "outputs": [
+            {"internalType": "address", "name": "", "type": "address"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getMarketCount",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "", "type": "address"}
+          ],
+          "name": "hasClaimedFreeTokens",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "marketAddress",
+              "type": "address"
+            }
+          ],
+          "name": "isMarketContract",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "", "type": "address"}
+          ],
+          "name": "isValidMarket",
+          "outputs": [
+            {"internalType": "bool", "name": "", "type": "bool"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "name": "marketContracts",
+          "outputs": [
+            {"internalType": "address", "name": "", "type": "address"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "name",
+          "outputs": [
+            {"internalType": "string", "name": "", "type": "string"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {"internalType": "address", "name": "", "type": "address"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "symbol",
+          "outputs": [
+            {"internalType": "string", "name": "", "type": "string"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "totalFTSupply",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "totalSupply",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
           "type": "function"
         }
       ];
@@ -687,12 +709,12 @@ class ContractAbiJson {
             {"internalType": "bool", "name": "_resolvedToYes", "type": "bool"},
             {
               "internalType": "uint256",
-              "name": "_initialYesShares",
+              "name": "_marketRemainYesShares",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "_initialNoShares",
+              "name": "_marketRemainNoShares",
               "type": "uint256"
             },
             {
@@ -706,19 +728,29 @@ class ContractAbiJson {
         },
         {
           "inputs": [],
-          "name": "getMarketState",
+          "name": "getMarketInitialYesNoShares",
           "outputs": [
-            {"internalType": "string", "name": "", "type": "string"}
+            {"internalType": "uint256", "name": "yes", "type": "uint256"},
+            {"internalType": "uint256", "name": "no", "type": "uint256"}
           ],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
-          "name": "getMarketYesNoShares",
+          "name": "getMarketRemainYesNoShares",
           "outputs": [
             {"internalType": "uint256", "name": "yes", "type": "uint256"},
             {"internalType": "uint256", "name": "no", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getMarketState",
+          "outputs": [
+            {"internalType": "string", "name": "", "type": "string"}
           ],
           "stateMutability": "view",
           "type": "function"
@@ -748,6 +780,15 @@ class ContractAbiJson {
         },
         {
           "inputs": [],
+          "name": "initialNoProbability",
+          "outputs": [
+            {"internalType": "int256", "name": "", "type": "int256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "initialNoShares",
           "outputs": [
             {"internalType": "uint256", "name": "", "type": "uint256"}
@@ -766,7 +807,34 @@ class ContractAbiJson {
         },
         {
           "inputs": [],
+          "name": "initialYesProbability",
+          "outputs": [
+            {"internalType": "int256", "name": "", "type": "int256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "initialYesShares",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "marketRemainNoShares",
+          "outputs": [
+            {"internalType": "uint256", "name": "", "type": "uint256"}
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "marketRemainYesShares",
           "outputs": [
             {"internalType": "uint256", "name": "", "type": "uint256"}
           ],

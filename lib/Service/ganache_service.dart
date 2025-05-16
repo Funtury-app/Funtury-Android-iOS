@@ -16,11 +16,11 @@ import 'package:web3dart/web3dart.dart';
 
 class GanacheService {
   static const String _rpcUrl =
-      "https://d241-2001-b400-e3ac-4100-d81d-deea-7056-80bb.ngrok-free.app";
+      "https://38e0-2001-b400-e3d5-dad2-2040-5ee6-c7e-3850.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
-      "0xd1659c1e6db804d140b9767226bb9d371fb7b062e64251bfe654b2a0628b9e3f");
+      "0xb12287df9e0c0d44dda53ca9507454df0616a8929e752db5783adc34862bcdfc");
   static final EthereumAddress userAddress =
-      EthereumAddress.fromHex("0x6B21C392F5aAD239f253aB4ed4a65d62fbbEEa99");
+      EthereumAddress.fromHex("0xCCc721037E1826E88233a3575551FeAD0311483b");
 
   late Client httpClient;
   late Web3Client ganacheClient;
@@ -72,6 +72,21 @@ class GanacheService {
     }
   }
 
+  Future<double> getUserBalance(EthereumAddress user) async {
+    try {
+      final result = await ganacheClient.call(
+          contract: FunturyContract.funturyContract,
+          function: FunturyContract.getBalance,
+          params: [user]);
+      final balance = (result[0] as BigInt) / BigInt.from(10).pow(18);
+      debugPrint("GanacheService getUserBalance result: $balance");
+      return (balance.toDouble());
+    } catch (e) {
+      debugPrint("GanacheService getUserBalance error: $e");
+      return (0.0);
+    }
+  }
+
   Future<List<Map<String, dynamic>>> queryAllMarkets() async {
     List<Map<String, dynamic>> data = [];
 
@@ -80,7 +95,8 @@ class GanacheService {
         address: FunturyContract.contractAddress,
         topics: [
           [
-            bytesToHex(FunturyContract.marketCreated.signature, include0x: true)
+            bytesToHex(FunturyContract.marketCreatedEvent.signature,
+                include0x: true)
           ],
         ],
         fromBlock: const BlockNum.genesis(),
@@ -94,10 +110,10 @@ class GanacheService {
 
         data.add(
           {
-            "title": decodedLog.title,
+            "title": decodedLog.marketTitle,
             "createTime": decodedLog.createTime,
             "preOrderTime": decodedLog.preOrderTime,
-            "resolutionTime": decodedLog.resolutionTime,
+            "resolutionTime": decodedLog.resolvedTime,
             "marketContract": decodedLog.marketContract,
             "yesProbability": 0.5,
             "noProbability": 0.5,
@@ -116,7 +132,7 @@ class GanacheService {
     try {
       final result = await ganacheClient.call(
           contract: FunturyContract.funturyContract,
-          function: FunturyContract.getAllMarkets,
+          function: FunturyContract.getAllMarket,
           params: []);
       final markets = List<EthereumAddress>.from(result[0] as List);
       debugPrint("GanacheService getAllMarkets result: $markets");
@@ -124,6 +140,38 @@ class GanacheService {
     } catch (e) {
       debugPrint("GanacheService getAllMarkets error: $e");
       return [];
+    }
+  }
+
+  Future<(bool, List<EthereumAddress>)> getAllFunturyUser() async {
+    List<EthereumAddress> data = [];
+    try {
+      final filter = FilterOptions(
+        address: FunturyContract.contractAddress,
+        topics: [
+          [
+            bytesToHex(FunturyContract.tokensClaimedEvent.signature,
+                include0x: true)
+          ],
+        ],
+        fromBlock: const BlockNum.genesis(),
+        toBlock: const BlockNum.current(),
+      );
+
+      final logs = await ganacheClient.getLogs(filter);
+
+      for (var log in logs) {
+        final decodedLog = TokensClaimedEvent.fromEventLog(log);
+
+        data.add(decodedLog.user);
+
+        debugPrint(decodedLog.toString());
+      }
+
+      return (true, data);
+    } catch (e) {
+      debugPrint("GanacheService queryAllMarket error: $e");
+      return (false, data);
     }
   }
 
@@ -264,7 +312,8 @@ class GanacheService {
     }
   }
 
-  Future<(bool, String)> claimRewardFromMarketRequest(EthereumAddress marketAddress) async{
+  Future<(bool, String)> claimRewardFromMarketRequest(
+      EthereumAddress marketAddress) async {
     PredictionMarketContract predictionMarketContract =
         PredictionMarketContract(contractAddress: marketAddress);
 
@@ -283,18 +332,19 @@ class GanacheService {
       await ganacheClient.sendRawTransaction(tx);
       return (true, "Claim reward success");
     } catch (e) {
-      if(e.runtimeType == RPCError){
+      if (e.runtimeType == RPCError) {
         e as RPCError;
-        if(e.data["reason"] == "Already claimed reward"){
+        if (e.data["reason"] == "Already claimed reward") {
           return (false, "Already claimed reward");
         }
       }
 
       debugPrint("GanacheService claimRewardFromMarketRequest error: $e");
-      
+
       return (false, "Claim reward failed");
     }
   }
+
   /// Prediction contract transfer function ///
 }
 

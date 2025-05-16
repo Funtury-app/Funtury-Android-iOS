@@ -7,4 +7,5 @@ class AssetsPath {
   static String get bellIcon => 'assets/icons/bell.svg';
   static String get newsIcon => 'assets/icons/news.svg';
   static String get walletIcon => 'assets/icons/wallet.svg';
+  static String get metalIcon => 'assets/icons/metal-solid.svg';
 }

@@ -6,58 +6,83 @@ class FunturyContract {
   static DeployedContract funturyContract = DeployedContract(
     ContractAbi.fromJson(
         jsonEncode(ContractAbiJson.funturyContractAbi), 'FunturyContract'),
-    EthereumAddress.fromHex("0x46990239349c59Cf82aA140a9A18c063e3097706"),
+    EthereumAddress.fromHex("0x29a3697a0EC463596bA1200D79D539bb36C5da4B"),
   );
-  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x46990239349c59Cf82aA140a9A18c063e3097706");
+  static EthereumAddress contractAddress = EthereumAddress.fromHex("0x29a3697a0EC463596bA1200D79D539bb36C5da4B");
 
   // Main contract functions
   static ContractFunction claimFreeTokens = funturyContract.function('claimFreeTokens');
   static ContractFunction createMarket = funturyContract.function("createMarket");
   static ContractFunction getMarketCount = funturyContract.function("getMarketCount");
-  static ContractFunction getAllMarkets = funturyContract.function("getAllMarkets");
+  static ContractFunction getAllMarket = funturyContract.function("getAllMarket");
   static ContractFunction getMarketContract = funturyContract.function("getMarketContract");
   static ContractFunction isMarketContract = funturyContract.function("isMarketContract");
+  static ContractFunction isValidMarket = funturyContract.function("isValidMarket");
   
   // Token management functions
   static ContractFunction transferFromUser = funturyContract.function("transferFromUser");
   static ContractFunction transferReward = funturyContract.function("transferReward");
   static ContractFunction transferBetweenUser = funturyContract.function("transferBetweenUser");
+  static ContractFunction emitTransferRecord = funturyContract.function("emitTransferRecord");
+  
+  // Standard ERC20 functions
+  static ContractFunction approve = funturyContract.function("approve");
+  static ContractFunction transfer = funturyContract.function("transfer");
+  static ContractFunction transferFrom = funturyContract.function("transferFrom");
+  static ContractFunction allowance = funturyContract.function("allowance");
+  static ContractFunction increaseAllowance = funturyContract.function("increaseAllowance");
+  static ContractFunction decreaseAllowance = funturyContract.function("decreaseAllowance");
   
   // Admin functions
-  static ContractFunction setFreeTokenAmount = funturyContract.function("setFreeTokenAmount");
   static ContractFunction mint = funturyContract.function("mint");
-  static ContractFunction resolveMarket = funturyContract.function("resolveMarket");
-  static ContractFunction cancelMarket = funturyContract.function("cancelMarket");
   static ContractFunction getBalance = funturyContract.function("balanceOf");
   
   // Contract state reading functions
   static ContractFunction owner = funturyContract.function("owner");
+  static ContractFunction name = funturyContract.function("name");
+  static ContractFunction symbol = funturyContract.function("symbol");
+  static ContractFunction decimals = funturyContract.function("decimals");
+  static ContractFunction totalSupply = funturyContract.function("totalSupply");
   static ContractFunction freeTokenAmount = funturyContract.function("freeTokenAmount");
   static ContractFunction hasClaimedFreeTokens = funturyContract.function("hasClaimedFreeTokens");
   static ContractFunction totalFTSupply = funturyContract.function("totalFTSupply");
   
   // Events
-  static ContractEvent tokensClaimed = funturyContract.event('TokensClaimed');
-  static ContractEvent marketCreated = funturyContract.event('MarketCreated');
-  static ContractEvent freeTokenAmountChanged = funturyContract.event('FreeTokenAmountChanged');
+  static ContractEvent tokensClaimedEvent = funturyContract.event('TokensClaimed');
+  static ContractEvent marketCreatedEvent = funturyContract.event('MarketCreated');
+  static ContractEvent transferEvent = funturyContract.event('Transfer');
+  static ContractEvent approvalEvent = funturyContract.event('Approval');
+  static ContractEvent marketTransferRecordEvent = funturyContract.event('MarketTransferRecord');
   
   // Event stream getters
   static Stream<TokensClaimedEvent> getTokensClaimedEvents(Web3Client client) {
     return client
-        .events(FilterOptions.events(contract: funturyContract,event: tokensClaimed))
+        .events(FilterOptions.events(contract: funturyContract, event: tokensClaimedEvent))
         .map((event) => TokensClaimedEvent.fromEventLog(event));
   }
   
   static Stream<MarketCreatedEvent> getMarketCreatedEvents(Web3Client client) {
     return client
-        .events(FilterOptions.events(contract: funturyContract, event: marketCreated))
+        .events(FilterOptions.events(contract: funturyContract, event: marketCreatedEvent))
         .map((event) => MarketCreatedEvent.fromEventLog(event));
   }
   
-  static Stream<FreeTokenAmountChangedEvent> getFreeTokenAmountChangedEvents(Web3Client client) {
+  static Stream<MarketTransferRecordEvent> getMarketTransferRecordEvents(Web3Client client) {
     return client
-        .events(FilterOptions.events(contract: funturyContract, event: freeTokenAmountChanged))
-        .map((event) => FreeTokenAmountChangedEvent.fromEventLog(event));
+        .events(FilterOptions.events(contract: funturyContract, event: marketTransferRecordEvent))
+        .map((event) => MarketTransferRecordEvent.fromEventLog(event));
+  }
+  
+  static Stream<TransferEvent> getTransferEvents(Web3Client client) {
+    return client
+        .events(FilterOptions.events(contract: funturyContract, event: transferEvent))
+        .map((event) => TransferEvent.fromEventLog(event));
+  }
+  
+  static Stream<ApprovalEvent> getApprovalEvents(Web3Client client) {
+    return client
+        .events(FilterOptions.events(contract: funturyContract, event: approvalEvent))
+        .map((event) => ApprovalEvent.fromEventLog(event));
   }
 }
 
@@ -69,7 +94,7 @@ class TokensClaimedEvent {
   TokensClaimedEvent(this.user, this.amount);
   
   static TokensClaimedEvent fromEventLog(FilterEvent event) {
-    final decodedData = FunturyContract.tokensClaimed.decodeResults(event.topics!, event.data!);
+    final decodedData = FunturyContract.tokensClaimedEvent.decodeResults(event.topics!, event.data!);
   
     final userAddress = decodedData[0] as EthereumAddress;
     final amount = decodedData[1] as BigInt;
@@ -79,37 +104,83 @@ class TokensClaimedEvent {
 }
 
 class MarketCreatedEvent {
-  final String title;
   final EthereumAddress marketContract;
+  final String marketTitle;
   final DateTime createTime;
-  final DateTime resolutionTime;
+  final DateTime resolvedTime;
   final DateTime preOrderTime;
   
-  MarketCreatedEvent(this.title, this.createTime, this.marketContract, this.resolutionTime, this.preOrderTime);
+  MarketCreatedEvent(this.marketContract, this.marketTitle, this.createTime, this.resolvedTime, this.preOrderTime);
   
   static MarketCreatedEvent fromEventLog(FilterEvent event) {
-    final decodedData = FunturyContract.marketCreated.decodeResults(event.topics!, event.data!);
+    final decodedData = FunturyContract.marketCreatedEvent.decodeResults(event.topics!, event.data!);
     
-    final createTime = DateTime.fromMillisecondsSinceEpoch((decodedData[2] as BigInt).toInt() * 1000);
     final marketContract = decodedData[0] as EthereumAddress;
-    final title = decodedData[1] as String;
-    final resolutionTime = DateTime.fromMillisecondsSinceEpoch((decodedData[3] as BigInt).toInt() * 1000);
+    final marketTitle = decodedData[1] as String;
+    final createTime = DateTime.fromMillisecondsSinceEpoch((decodedData[2] as BigInt).toInt() * 1000);
+    final resolvedTime = DateTime.fromMillisecondsSinceEpoch((decodedData[3] as BigInt).toInt() * 1000);
     final preOrderTime = DateTime.fromMillisecondsSinceEpoch((decodedData[4] as BigInt).toInt() * 1000);
     
-    return MarketCreatedEvent(title, createTime, marketContract, resolutionTime, preOrderTime);
+    return MarketCreatedEvent(marketContract, marketTitle, createTime, resolvedTime, preOrderTime);
   }
 }
 
-class FreeTokenAmountChangedEvent {
-  final BigInt newAmount;
+class MarketTransferRecordEvent {
+  final EthereumAddress from;
+  final EthereumAddress to;
+  final EthereumAddress marketContract;
+  final bool isYes;
+  final BigInt amount;
+  final BigInt totalPrice;
   
-  FreeTokenAmountChangedEvent(this.newAmount);
+  MarketTransferRecordEvent(this.from, this.to, this.marketContract, this.isYes, this.amount, this.totalPrice);
   
-  static FreeTokenAmountChangedEvent fromEventLog(FilterEvent event) {
-    final decodedData = FunturyContract.freeTokenAmountChanged.decodeResults(event.topics!, event.data!);
+  static MarketTransferRecordEvent fromEventLog(FilterEvent event) {
+    final decodedData = FunturyContract.marketTransferRecordEvent.decodeResults(event.topics!, event.data!);
     
-    final amount = decodedData[0] as BigInt;
+    final from = decodedData[0] as EthereumAddress;
+    final to = decodedData[1] as EthereumAddress;
+    final marketContract = decodedData[2] as EthereumAddress;
+    final isYes = decodedData[3] as bool;
+    final amount = decodedData[4] as BigInt;
+    final totalPrice = decodedData[5] as BigInt;
     
-    return FreeTokenAmountChangedEvent(amount);
+    return MarketTransferRecordEvent(from, to, marketContract, isYes, amount, totalPrice);
+  }
+}
+
+class TransferEvent {
+  final EthereumAddress from;
+  final EthereumAddress to;
+  final BigInt value;
+  
+  TransferEvent(this.from, this.to, this.value);
+  
+  static TransferEvent fromEventLog(FilterEvent event) {
+    final decodedData = FunturyContract.transferEvent.decodeResults(event.topics!, event.data!);
+    
+    final from = decodedData[0] as EthereumAddress;
+    final to = decodedData[1] as EthereumAddress;
+    final value = decodedData[2] as BigInt;
+    
+    return TransferEvent(from, to, value);
+  }
+}
+
+class ApprovalEvent {
+  final EthereumAddress owner;
+  final EthereumAddress spender;
+  final BigInt value;
+  
+  ApprovalEvent(this.owner, this.spender, this.value);
+  
+  static ApprovalEvent fromEventLog(FilterEvent event) {
+    final decodedData = FunturyContract.approvalEvent.decodeResults(event.topics!, event.data!);
+    
+    final owner = decodedData[0] as EthereumAddress;
+    final spender = decodedData[1] as EthereumAddress;
+    final value = decodedData[2] as BigInt;
+    
+    return ApprovalEvent(owner, spender, value);
   }
 }

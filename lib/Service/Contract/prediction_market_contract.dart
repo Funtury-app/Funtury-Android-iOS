@@ -38,8 +38,12 @@ class PredictionMarketContract {
   ContractFunction getInitialPrice() => contract.function("getInitialPrice");
   ContractFunction initialYesShares() => contract.function("initialYesShares");
   ContractFunction initialNoShares() => contract.function("initialNoShares");
-  ContractFunction getMarketYesNoShares() =>
-      contract.function("getMarketYesNoShares");
+  ContractFunction initialYesProbability() => contract.function("initialYesProbability");
+  ContractFunction initialNoProbability() => contract.function("initialNoProbability");
+  ContractFunction marketRemainYesShares() => contract.function("marketRemainYesShares");
+  ContractFunction marketRemainNoShares() => contract.function("marketRemainNoShares");
+  ContractFunction getMarketInitialYesNoShares() => contract.function("getMarketInitialYesNoShares");
+  ContractFunction getMarketRemainYesNoShares() => contract.function("getMarketRemainYesNoShares");
 
   // User-related functions
   ContractFunction getUserShares() => contract.function("getUserShares");
@@ -49,8 +53,7 @@ class PredictionMarketContract {
   ContractFunction checkReward() => contract.function("checkReward");
 
   // Action functions
-  ContractFunction checkAndEndPreorder() =>
-      contract.function("checkAndEndPreorder");
+  ContractFunction checkAndEndPreorder() => contract.function("checkAndEndPreorder");
   ContractFunction transferShares() => contract.function("transferShares");
   ContractFunction preOrderTransfer() => contract.function("preOrderTransfer");
   ContractFunction resolveMarket() => contract.function("resolveMarket");
@@ -60,44 +63,38 @@ class PredictionMarketContract {
   // Events
   ContractEvent marketResolved() => contract.event('MarketResolved');
   ContractEvent marketCancelled() => contract.event('MarketCancelled');
-  ContractEvent sharesPurchased() => contract.event('SharesPurchased');
-  ContractEvent userPositionUpdated() => contract.event('UserPositionUpdated');
+  ContractEvent yesTransaction() => contract.event('YesTransaction');
+  ContractEvent noTransaction() => contract.event('NoTransaction');
   ContractEvent rewardClaimed() => contract.event('RewardClaimed');
 
   // Event stream getters
   Stream<MarketResolvedEvent> getMarketResolvedEvents(Web3Client client) {
     return client
-        .events(
-            FilterOptions.events(contract: contract, event: marketResolved()))
+        .events(FilterOptions.events(contract: contract, event: marketResolved()))
         .map((event) => MarketResolvedEvent.fromEventLog(this, event));
   }
 
   Stream<MarketCancelledEvent> getMarketCancelledEvents(Web3Client client) {
     return client
-        .events(
-            FilterOptions.events(contract: contract, event: marketCancelled()))
+        .events(FilterOptions.events(contract: contract, event: marketCancelled()))
         .map((event) => MarketCancelledEvent.fromEventLog(this, event));
   }
 
-  Stream<SharesPurchasedEvent> getSharesPurchasedEvents(Web3Client client) {
+  Stream<YesTransactionEvent> getYesTransactionEvents(Web3Client client) {
     return client
-        .events(
-            FilterOptions.events(contract: contract, event: sharesPurchased()))
-        .map((event) => SharesPurchasedEvent.fromEventLog(this, event));
+        .events(FilterOptions.events(contract: contract, event: yesTransaction()))
+        .map((event) => YesTransactionEvent.fromEventLog(this, event));
   }
 
-  Stream<UserPositionUpdatedEvent> getUserPositionUpdatedEvents(
-      Web3Client client) {
+  Stream<NoTransactionEvent> getNoTransactionEvents(Web3Client client) {
     return client
-        .events(FilterOptions.events(
-            contract: contract, event: userPositionUpdated()))
-        .map((event) => UserPositionUpdatedEvent.fromEventLog(this, event));
+        .events(FilterOptions.events(contract: contract, event: noTransaction()))
+        .map((event) => NoTransactionEvent.fromEventLog(this, event));
   }
 
   Stream<RewardClaimedEvent> getRewardClaimedEvents(Web3Client client) {
     return client
-        .events(
-            FilterOptions.events(contract: contract, event: rewardClaimed()))
+        .events(FilterOptions.events(contract: contract, event: rewardClaimed()))
         .map((event) => RewardClaimedEvent.fromEventLog(this, event));
   }
 }
@@ -139,50 +136,49 @@ class MarketCancelledEvent {
   }
 }
 
-class SharesPurchasedEvent {
-  final EthereumAddress market;
-  final EthereumAddress buyer;
-  final bool isYes;
+class YesTransactionEvent {
+  final EthereumAddress from;
+  final EthereumAddress to;
   final BigInt amount;
+  final BigInt totalCost;
 
-  SharesPurchasedEvent(this.market, this.buyer, this.isYes, this.amount);
+  YesTransactionEvent(this.from, this.to, this.amount, this.totalCost);
 
-  static SharesPurchasedEvent fromEventLog(
+  static YesTransactionEvent fromEventLog(
       PredictionMarketContract contractInstance, FilterEvent event) {
     final decodedData = contractInstance
-        .sharesPurchased()
+        .yesTransaction()
         .decodeResults(event.topics!, event.data!);
 
-    final market = decodedData[0] as EthereumAddress;
-    final buyer = decodedData[1] as EthereumAddress;
-    final isYes = decodedData[2] as bool;
-    final amount = decodedData[3] as BigInt;
+    final from = decodedData[0] as EthereumAddress;
+    final to = decodedData[1] as EthereumAddress;
+    final amount = decodedData[2] as BigInt;
+    final totalCost = decodedData[3] as BigInt;
 
-    return SharesPurchasedEvent(market, buyer, isYes, amount);
+    return YesTransactionEvent(from, to, amount, totalCost);
   }
 }
 
-class UserPositionUpdatedEvent {
-  final EthereumAddress user;
-  final EthereumAddress market;
-  final BigInt yesAmount;
-  final BigInt noAmount;
+class NoTransactionEvent {
+  final EthereumAddress from;
+  final EthereumAddress to;
+  final BigInt amount;
+  final BigInt totalCost;
 
-  UserPositionUpdatedEvent(
-      this.user, this.market, this.yesAmount, this.noAmount);
+  NoTransactionEvent(this.from, this.to, this.amount, this.totalCost);
 
-  static UserPositionUpdatedEvent fromEventLog(
+  static NoTransactionEvent fromEventLog(
       PredictionMarketContract contractInstance, FilterEvent event) {
     final decodedData = contractInstance
-        .userPositionUpdated()
+        .noTransaction()
         .decodeResults(event.topics!, event.data!);
 
-    final user = decodedData[0] as EthereumAddress;
-    final market = decodedData[1] as EthereumAddress;
-    final yesAmount = decodedData[2] as BigInt;
-    final noAmount = decodedData[3] as BigInt;
+    final from = decodedData[0] as EthereumAddress;
+    final to = decodedData[1] as EthereumAddress;
+    final amount = decodedData[2] as BigInt;
+    final totalCost = decodedData[3] as BigInt;
 
-    return UserPositionUpdatedEvent(user, market, yesAmount, noAmount);
+    return NoTransactionEvent(from, to, amount, totalCost);
   }
 }
 
