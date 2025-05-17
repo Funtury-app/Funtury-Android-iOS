@@ -1,6 +1,8 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funtury/Data/event_detail.dart';
+import 'package:funtury/Data/yes_no_transaction.dart';
 import 'package:funtury/MainPage/trade_detail_page_controller.dart';
 import 'package:reown_appkit/reown_appkit.dart';
 import 'package:web3dart/credentials.dart';
@@ -91,7 +93,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Color(0xFF2C76EE).withOpacity(0.8),
                           ),
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(2.0),
@@ -180,7 +182,20 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                             Expanded(
                                 child: Container(
                               alignment: Alignment.center,
-                              child: Text("Yes/No Diagram"),
+                              child: tradeDetailPageController
+                                      .diagramDataLoading
+                                  ? CircularProgressIndicator(
+                                      color: Colors.grey,
+                                    )
+                                  : tradeDetailPageController.isYesDiagram
+                                      ? YesNoDiagram(
+                                          transactionData:
+                                              tradeDetailPageController
+                                                  .yesTransactions)
+                                      : YesNoDiagram(
+                                          transactionData:
+                                              tradeDetailPageController
+                                                  .noTransactions),
                             ))
                           ],
                         ),
@@ -950,17 +965,14 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                                 height: 40,
                                 width: 200,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 2,
-                                      blurRadius: 5,
-                                
-                                    ),
-                                  ]
-                                ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                      ),
+                                    ]),
                                 child: ElevatedButton(
                                     onPressed:
                                         tradeDetailPageController.rewardClaiming
@@ -999,6 +1011,208 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
               ),
             ),
           )),
+    );
+  }
+}
+
+class YesNoDiagram extends StatelessWidget {
+  const YesNoDiagram({super.key, required this.transactionData, this.baseProbability = 0.5});
+
+  final List<YesNoTransaction> transactionData;
+  final timeInterval = 86400000; // 1 day in millie seconds
+  final double baseProbability;
+
+  @override
+  Widget build(BuildContext context) {
+    // double _minx =
+    //     DateTime.parse(transactionData.first.timestamp.toString().split(' ')[0])
+    //         .millisecondsSinceEpoch
+    //         .toDouble();
+    // double _maxx = DateTime.parse(DateTime.now().toString().split(' ')[0])
+    //     .millisecondsSinceEpoch
+    //     .toDouble();
+    // if (_minx == _maxx) {
+    //   _maxx = _minx + timeInterval.toDouble();
+    // }
+
+    double _minx = transactionData.first.timestamp.millisecondsSinceEpoch.toDouble();
+    double _maxx = transactionData.last.timestamp.millisecondsSinceEpoch.toDouble();
+    Map<int, YesNoTransaction> transactionMap = {};
+    for (int i = 0; i < transactionData.length; i++) {
+      transactionMap[transactionData[i].timestamp.millisecondsSinceEpoch] =
+          transactionData[i];
+    }
+
+
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(
+          show: true,
+          drawHorizontalLine: true,
+          drawVerticalLine: false,
+          horizontalInterval: 0.1,
+          verticalInterval: 1.0,
+          // verticalInterval: timeInterval.toDouble(),
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Color(0xFF2C76EE).withOpacity(0.3),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: timeInterval.toDouble(),
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                return SideTitleWidget(
+                  space: 4.0,
+                  meta: meta,
+                  child: Text(
+                    "${date.year}/${date.month}/${date.day}",
+                    style: TextStyle(
+                      color: Color(0xFF2C76EE).withOpacity(0.5),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+              reservedSize: 28,
+              showTitles: true,
+              maxIncluded: false,
+              interval: 0.1,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  space: 4.0,
+                  meta: meta,
+                  child: Text(
+                    "${(value * 100).toStringAsFixed(0)}%",
+                    style: TextStyle(
+                      color: Color(0xFF2C76EE).withOpacity(0.5),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        borderData: FlBorderData(
+          show: true,
+          border: Border(
+            bottom: BorderSide(color: Colors.black26, width: 1),
+            left: BorderSide(color: Colors.black26, width: 1),
+            right: BorderSide(color: Colors.transparent),
+            top: BorderSide(color: Colors.transparent),
+          ),
+        ),
+        minX: _minx,
+        maxX: _maxx,
+        // minX: 0,
+        // maxX: transactionData.length.toDouble() - 1,
+        minY: 0,
+        maxY: 1.0,
+        clipData: FlClipData.all(),
+        lineBarsData: [
+          LineChartBarData(
+            spots: _createSpots(),
+            isCurved: false,
+            color: Color(0xFF2C76EE).withOpacity(0.8),
+            barWidth: 3,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 2,
+                  color: Colors.blue,
+                  strokeWidth: 1,
+                  strokeColor: Colors.white,
+                );
+              },
+            ),
+            aboveBarData: BarAreaData(
+              show: true,
+              cutOffY: 0.5,
+              applyCutOffY: true,
+              color: Colors.green.withOpacity(0.5),
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              cutOffY: 0.5,
+              applyCutOffY: true,
+              color: Colors.red.withOpacity(0.5),
+            ),
+          ),
+        ],
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipItems: (List<LineBarSpot> touchedSpots) {
+              return touchedSpots.map((spot) {
+                final millesecond = spot.x.toInt();
+                if (transactionMap[millesecond] != null) {
+                  final transaction = transactionMap[millesecond]!;
+                  return LineTooltipItem(
+                    '${transaction.timestamp.year}-${transaction.timestamp.month}-${transaction.timestamp.day} ${transaction.timestamp.hour}:${transaction.timestamp.minute}:${transaction.timestamp.second}\n',
+                    const TextStyle(color: Colors.white),
+                    children: [
+                      TextSpan(
+                        text:
+                            'price: ${transaction.perPrice.toStringAsFixed(2)}\n',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "amount: "
+                            "${transaction.amount}\n",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "totalCost: "
+                            "${transaction.totalCost}\n",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return null;
+              }).toList();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<FlSpot> _createSpots() {
+    return List.generate(
+      transactionData.length,
+      (index) => FlSpot(transactionData[index].timestamp.millisecondsSinceEpoch.toDouble(), transactionData[index].perPrice),
+      // (index) => FlSpot(index.toDouble(), transactionData[index].perPrice),
     );
   }
 }

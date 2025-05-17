@@ -18,9 +18,9 @@ class GanacheService {
   static const String _rpcUrl =
       "https://9250-120-126-194-245.ngrok-free.app";
   static final EthPrivateKey _privateKey = EthPrivateKey.fromHex(
-      "0xb12287df9e0c0d44dda53ca9507454df0616a8929e752db5783adc34862bcdfc");
+      "0xc20a228ce44302bfb2e42038b4e37983c46ca0b939050be9a3c9d34a15a17445");
   static final EthereumAddress userAddress =
-      EthereumAddress.fromHex("0xCCc721037E1826E88233a3575551FeAD0311483b");
+      EthereumAddress.fromHex("0x37DdA0C7C92029Bc8787eA418fD7e0Eda7Fa2e6A");
 
   late Client httpClient;
   late Web3Client ganacheClient;
@@ -345,6 +345,89 @@ class GanacheService {
     }
   }
 
+  Future<(bool, List<Map<String, dynamic>>)> queryAllYesTransactionRecord(EthereumAddress marketAddress) async {
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+    List<Map<String, dynamic>> data = [];
+
+    try {
+      final filter = FilterOptions(
+        address: marketAddress,
+        topics: [
+          [
+            bytesToHex(predictionMarketContract.yesTransaction().signature,
+                include0x: true)
+          ],
+        ],
+        fromBlock: const BlockNum.genesis(),
+        toBlock: const BlockNum.current(),
+      );
+
+      final logs = await ganacheClient.getLogs(filter);
+
+      for (var log in logs) {
+        final decodedLog = YesTransactionEvent.fromEventLog(predictionMarketContract,log);
+
+        data.add(
+          {
+            "from": decodedLog.from,
+            "to": decodedLog.to,
+            "amount": decodedLog.amount,
+            "totalCost": decodedLog.totalCost,
+            "timestamp": decodedLog.timestamp,
+          },
+        );
+
+        debugPrint(decodedLog.toString());
+      }
+    } catch (e) {
+      debugPrint("GanacheService queryAllYesTransactionRecord error: $e");
+      return(false, data);
+    }
+    return (true, data);
+  }
+
+  Future<(bool, List<Map<String, dynamic>>)> queryAllNoTransactionRecord(EthereumAddress marketAddress) async {
+    PredictionMarketContract predictionMarketContract =
+        PredictionMarketContract(contractAddress: marketAddress);
+    List<Map<String, dynamic>> data = [];
+
+    try {
+      final filter = FilterOptions(
+        address: marketAddress,
+        topics: [
+          [
+            bytesToHex(predictionMarketContract.noTransaction().signature,
+                include0x: true)
+          ],
+        ],
+        fromBlock: const BlockNum.genesis(),
+        toBlock: const BlockNum.current(),
+      );
+
+      final logs = await ganacheClient.getLogs(filter);
+
+      for (var log in logs) {
+        final decodedLog = NoTransactionEvent.fromEventLog(predictionMarketContract,log);
+
+        data.add(
+          {
+            "from": decodedLog.from,
+            "to": decodedLog.to,
+            "amount": decodedLog.amount,
+            "totalCost": decodedLog.totalCost,
+            "timestamp": decodedLog.timestamp,
+          },
+        );
+
+        debugPrint(decodedLog.toString());
+      }
+    } catch (e) {
+      debugPrint("GanacheService queryAllNoTransactionRecord error: $e");
+      return(false, data);
+    }
+    return (true, data);
+  }
   /// Prediction contract transfer function ///
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funtury/Data/event_detail.dart';
+import 'package:funtury/Data/yes_no_transaction.dart';
 import 'package:funtury/Service/ganache_service.dart';
 import 'package:reown_appkit/modal/pages/preview_send/utils.dart';
 import 'package:reown_appkit/reown_appkit.dart';
@@ -14,6 +15,8 @@ class TradeDetailPageController {
 
   final ganacheService = GanacheService();
   EventDetail eventDetail = EventDetail.initFromDefault();
+  List<YesNoTransaction> yesTransactions = [];
+  List<YesNoTransaction> noTransactions = [];
 
   late BuildContext context;
   late void Function(VoidCallback) setState;
@@ -27,6 +30,7 @@ class TradeDetailPageController {
   bool isYesPosition = true;
 
   bool marketInfoLoading = false;
+  bool diagramDataLoading = false;
   bool purchaseRequestSending = false;
   bool rewardClaiming = false;
 
@@ -94,6 +98,10 @@ class TradeDetailPageController {
           userNoPosition = value.$2.toInt();
         });
       }
+
+      // Load diagram data
+      lodaYesNoTransactionData();
+
       debugPrint("Market info: $data");
     } catch (e) {
       if (context.mounted) {
@@ -124,6 +132,62 @@ class TradeDetailPageController {
     setState(() {
       marketInfoLoading = false;
     });
+  }
+
+  Future lodaYesNoTransactionData() async {
+    if (diagramDataLoading) return;
+    setState(() {
+      diagramDataLoading = true;
+    });
+
+    try {
+      final result = await Future.wait([
+        ganacheService.queryAllYesTransactionRecord(marketAddress),
+        ganacheService.queryAllNoTransactionRecord(marketAddress),
+      ]);
+
+      if (result[0].$1 && result[1].$1) {
+        yesTransactions =
+            result[0].$2.map((e) => YesNoTransaction.fromData(e)).toList();
+        noTransactions =
+            result[1].$2.map((e) => YesNoTransaction.fromData(e)).toList();
+
+        yesTransactions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        noTransactions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+        debugPrint("Yes transactions: $yesTransactions");
+        debugPrint("No transactions: $noTransactions");
+      } else {
+        throw Exception("Failed to load transaction data");
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Error"),
+                content: const Text(
+                    "Failed to load transaction data. Please try again."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            });
+      }
+      debugPrint("Diagram data loading error: $e");
+    }
+
+    if (context.mounted) {
+      setState(() {
+        diagramDataLoading = false;
+      });
+    }
   }
 
   void switchDiagram(int? newValue) {

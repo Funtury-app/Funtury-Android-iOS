@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:funtury/Service/Contract/contract_abi_json.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -141,8 +142,9 @@ class YesTransactionEvent {
   final EthereumAddress to;
   final BigInt amount;
   final BigInt totalCost;
+  final DateTime timestamp;
 
-  YesTransactionEvent(this.from, this.to, this.amount, this.totalCost);
+  YesTransactionEvent(this.from, this.to, this.amount, this.totalCost, this.timestamp);
 
   static YesTransactionEvent fromEventLog(
       PredictionMarketContract contractInstance, FilterEvent event) {
@@ -154,8 +156,9 @@ class YesTransactionEvent {
     final to = decodedData[1] as EthereumAddress;
     final amount = decodedData[2] as BigInt;
     final totalCost = decodedData[3] as BigInt;
+    final timestamp = DateTime.fromMillisecondsSinceEpoch((decodedData[4] as BigInt).toInt() * 1000);
 
-    return YesTransactionEvent(from, to, amount, totalCost);
+    return YesTransactionEvent(from, to, amount, totalCost, timestamp);
   }
 }
 
@@ -164,8 +167,9 @@ class NoTransactionEvent {
   final EthereumAddress to;
   final BigInt amount;
   final BigInt totalCost;
+  final DateTime timestamp;
 
-  NoTransactionEvent(this.from, this.to, this.amount, this.totalCost);
+  NoTransactionEvent(this.from, this.to, this.amount, this.totalCost, this.timestamp);
 
   static NoTransactionEvent fromEventLog(
       PredictionMarketContract contractInstance, FilterEvent event) {
@@ -177,8 +181,9 @@ class NoTransactionEvent {
     final to = decodedData[1] as EthereumAddress;
     final amount = decodedData[2] as BigInt;
     final totalCost = decodedData[3] as BigInt;
+    final timestamp = DateTime.fromMillisecondsSinceEpoch((decodedData[4] as BigInt).toInt() * 1000);
 
-    return NoTransactionEvent(from, to, amount, totalCost);
+    return NoTransactionEvent(from, to, amount, totalCost, timestamp);
   }
 }
 
