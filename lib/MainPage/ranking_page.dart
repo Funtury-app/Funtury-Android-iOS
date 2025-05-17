@@ -20,6 +20,23 @@ class _RankingPageState extends State<RankingPage> {
       rankScroll: ScrollController(),
     );
     rankingPageController.init();
+    rankingPageController.rankScroll.addListener(() {
+      if (rankingPageController.rankScroll.position.pixels <= 0) {
+        rankingPageController.setState(() {
+          rankingPageController.showScrollToTopButton = false;
+        });
+      } else {
+        rankingPageController.setState(() {
+          rankingPageController.showScrollToTopButton = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    rankingPageController.rankScroll.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,33 +70,62 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                   // Leader Board
                   SizedBox(
-                    width: 360,
-                    height: 546,
-                    child: RefreshIndicator(
-                      onRefresh: () async {},
-                      child: ListView(
-                        padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                        controller: rankingPageController.rankScroll,
-                        physics: const AlwaysScrollableScrollPhysics(),
+                      width: 360,
+                      height: 546,
+                      child: Stack(
                         children: [
-                          for (int i = 0;
-                              i < rankingPageController.userList.length;
-                              i++) ...[
-                            RankingCard(
-                              place: i + 1,
-                              userinfo: rankingPageController.userList[i],
+                          RefreshIndicator(
+                            backgroundColor: Colors.transparent,
+                            onRefresh: rankingPageController.init,
+                            child: ListView(
+                              padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                              controller: rankingPageController.rankScroll,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                for (int i = 0;
+                                    i < rankingPageController.userList.length;
+                                    i++) ...[
+                                  RankingCard(
+                                    place: i + 1,
+                                    userinfo: rankingPageController.userList[i],
+                                  ),
+                                ],
+                                if (rankingPageController.isLoading)
+                                  const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                              ],
                             ),
-                          ],
-                          if (rankingPageController.isLoading)
-                            const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.grey,
-                              ),
-                            ),
+                          ),
+                          if (rankingPageController.showScrollToTopButton)
+                            Positioned(
+                              bottom: 10,
+                              right: 10,
+                              child: Opacity(
+                                  opacity: 0.85,
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.arrow_upward,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed:
+                                          rankingPageController.scrollToTop,
+                                    ),
+                                  )),
+                            )
                         ],
-                      ),
-                    ),
-                  ),
+                      )),
                   Divider(
                     color: Colors.grey,
                     thickness: 1,
@@ -162,7 +208,6 @@ class RankingCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.fade,
-              
             ),
           ),
 

@@ -15,6 +15,7 @@ class RankingPageController {
   GanacheService ganacheService = GanacheService();
 
   bool isLoading = false;
+  bool showScrollToTopButton = false;
 
   List<User> userList = [];
   User selfInfo = User(self: true, userAddress: EthereumAddress.fromHex("0xCCc721037E1826E88233a3575551FeAD0311483b"), userBalance: 0);
@@ -81,7 +82,10 @@ class RankingPageController {
     });
   }
 
-  Future refresh() async {}
+  Future refresh() async {
+    await init();
+    return;
+  }
 
   void scrollToTop() {
     rankScroll.animateTo(
