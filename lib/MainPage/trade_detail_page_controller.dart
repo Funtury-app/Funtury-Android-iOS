@@ -226,6 +226,10 @@ class TradeDetailPageController {
   }
 
   void amountTextControllerOnChange(String value) {
+    if(value.isEmpty){
+      amount = 0;
+      return;
+    }
     if (value.toInt()! > maxAmount) {
       amountTextController.text = maxAmount.toString();
     } else if (value.toInt()! < minAmount) {
@@ -238,6 +242,10 @@ class TradeDetailPageController {
   }
 
   void priceTextControllerOnChange(String value) {
+    if(value.isEmpty){
+      price = 0;
+      return;
+    }
     double inputValue = value.toDouble().toStringAsFixed(2).toDouble();
     if (inputValue > maxPrice) {
       priceTextController.text = maxPrice.toStringAsFixed(2);

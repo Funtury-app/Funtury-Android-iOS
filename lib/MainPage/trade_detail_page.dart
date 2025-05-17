@@ -63,6 +63,7 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
             child: Scaffold(
               extendBody: true,
               extendBodyBehindAppBar: true,
+              resizeToAvoidBottomInset: true,
               body: Container(
                 padding: const EdgeInsets.fromLTRB(8.0, 25.0, 8.0, 10.0),
                 decoration: BoxDecoration(
@@ -153,53 +154,54 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
                       ),
                       const SizedBox(height: 20),
                       // Diagram Place
-                      Container(
-                        width: 345,
-                        height: 313,
-                        alignment: Alignment.center,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Yes No diagram switcher
-                            SizedBox(
-                              width: 200,
-                              child: CupertinoSlidingSegmentedControl(
-                                children: {
-                                  0: Text("Yes"),
-                                  1: Text("No"),
-                                },
-                                groupValue: tradeDetailPageController
-                                    .slidingYesNoDiagram,
-                                onValueChanged: (int? newValue) {
-                                  tradeDetailPageController
-                                      .switchDiagram(newValue!);
-                                },
+                      if (MediaQuery.of(context).viewInsets.bottom == 0)
+                        Container(
+                          width: 345,
+                          height: 313,
+                          alignment: Alignment.center,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Yes No diagram switcher
+                              SizedBox(
+                                width: 200,
+                                child: CupertinoSlidingSegmentedControl(
+                                  children: {
+                                    0: Text("Yes"),
+                                    1: Text("No"),
+                                  },
+                                  groupValue: tradeDetailPageController
+                                      .slidingYesNoDiagram,
+                                  onValueChanged: (int? newValue) {
+                                    tradeDetailPageController
+                                        .switchDiagram(newValue!);
+                                  },
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Expanded(
-                                child: Container(
-                              alignment: Alignment.center,
-                              child: tradeDetailPageController
-                                      .diagramDataLoading
-                                  ? CircularProgressIndicator(
-                                      color: Colors.grey,
-                                    )
-                                  : tradeDetailPageController.isYesDiagram
-                                      ? YesNoDiagram(
-                                          transactionData:
-                                              tradeDetailPageController
-                                                  .yesTransactions)
-                                      : YesNoDiagram(
-                                          transactionData:
-                                              tradeDetailPageController
-                                                  .noTransactions),
-                            ))
-                          ],
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              Expanded(
+                                  child: Container(
+                                alignment: Alignment.center,
+                                child:
+                                    tradeDetailPageController.diagramDataLoading
+                                        ? CircularProgressIndicator(
+                                            color: Colors.grey,
+                                          )
+                                        : tradeDetailPageController.isYesDiagram
+                                            ? YesNoDiagram(
+                                                transactionData:
+                                                    tradeDetailPageController
+                                                        .yesTransactions)
+                                            : YesNoDiagram(
+                                                transactionData:
+                                                    tradeDetailPageController
+                                                        .noTransactions),
+                              ))
+                            ],
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 20),
                       // Buy Sell position and Price Amount input
                       if (tradeDetailPageController.eventDetail.marketState ==
@@ -1016,7 +1018,8 @@ class _TradeDetailPageState extends State<TradeDetailPage> {
 }
 
 class YesNoDiagram extends StatelessWidget {
-  const YesNoDiagram({super.key, required this.transactionData, this.baseProbability = 0.5});
+  const YesNoDiagram(
+      {super.key, required this.transactionData, this.baseProbability = 0.5});
 
   final List<YesNoTransaction> transactionData;
   final timeInterval = 86400000; // 1 day in millie seconds
@@ -1035,14 +1038,15 @@ class YesNoDiagram extends StatelessWidget {
     //   _maxx = _minx + timeInterval.toDouble();
     // }
 
-    double _minx = transactionData.first.timestamp.millisecondsSinceEpoch.toDouble();
-    double _maxx = transactionData.last.timestamp.millisecondsSinceEpoch.toDouble();
+    double _minx =
+        transactionData.first.timestamp.millisecondsSinceEpoch.toDouble();
+    double _maxx =
+        transactionData.last.timestamp.millisecondsSinceEpoch.toDouble();
     Map<int, YesNoTransaction> transactionMap = {};
     for (int i = 0; i < transactionData.length; i++) {
       transactionMap[transactionData[i].timestamp.millisecondsSinceEpoch] =
           transactionData[i];
     }
-
 
     return LineChart(
       LineChartData(
@@ -1211,7 +1215,9 @@ class YesNoDiagram extends StatelessWidget {
   List<FlSpot> _createSpots() {
     return List.generate(
       transactionData.length,
-      (index) => FlSpot(transactionData[index].timestamp.millisecondsSinceEpoch.toDouble(), transactionData[index].perPrice),
+      (index) => FlSpot(
+          transactionData[index].timestamp.millisecondsSinceEpoch.toDouble(),
+          transactionData[index].perPrice),
       // (index) => FlSpot(index.toDouble(), transactionData[index].perPrice),
     );
   }
